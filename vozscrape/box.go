@@ -2,6 +2,8 @@
 package vozscrape
 
 import (
+	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
@@ -55,7 +57,7 @@ func (g *Box) getAsyncThreads() []*Thread {
 
 // The function that will launch our GoRoutines: in order to prevent race conditions
 // we will sync all of our routines
-func (g *Box) fetchThreads(Posts chan *Thread, pSelector *goquery.Selection, pLen int) {
+func (g *Box) fetchThreads(Threads chan *Thread, pSelector *goquery.Selection, pLen int) {
 	var wg sync.WaitGroup
 
 	// We are telling to the WaitGroup
@@ -67,16 +69,23 @@ func (g *Box) fetchThreads(Posts chan *Thread, pSelector *goquery.Selection, pLe
 	// Loop through every Post in the page
 	pSelector.Each(func(i int, s *goquery.Selection) {
 
-		title := s.Find("h3")
-		url, _ := title.Find("a").Attr("href")
+		title := s.Find("td:nth-child(2) > div:first-child > a:last-of-type")
+		source, _ := s.Find("td:nth-child(2)").Attr("title")
+		fmt.Println(title)
+		id, _ := title.Attr("href")
+		pageURL, _ := s.Find("td:nth-child(2) div:first-child span.smallfont a:last-child").Attr("href")
+		pageCount := "1"
+		if pageURL != "" {
+			pageCount = strings.Split(pageURL, "page=")[1]
+		}
 
-		// Fetch every Post concurrently with
+		// Fetch every Thread concurrently with
 		// a GoRoutine
 		go func(Threads chan *Thread) {
 			defer wg.Done()
-			Posts <- NewThreads(title.Text(), url)
+			Threads <- NewThread(id, title.Text(), source, pageCount)
 
-		}(Posts)
+		}(Threads)
 	})
 
 	wg.Wait()
