@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/ref/mercato/scraper"
+	"github.com/nnti3n/voz-archive-plus/scraper"
 )
 
 // Box is the model for the forum box

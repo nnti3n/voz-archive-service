@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"voz-archive-plus/utilities"
-	"voz-archive-plus/vozscrape"
+	"github.com/nnti3n/voz-archive-plus/utilities"
+	"github.com/nnti3n/voz-archive-plus/vozscrape"
 )
 
 // this is the console application

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/ref/mercato/scraper"
+	"github.com/nnti3n/voz-archive-plus/scraper"
 )
 
 // Thread is the model for the forums threads
