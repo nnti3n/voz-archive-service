@@ -1,4 +1,4 @@
-//Package vozscrape, isolate package vozscrape from the rest of the application
+//Package vozscrape isolate package vozscrape from the rest of the application
 package vozscrape
 
 import (
@@ -7,7 +7,8 @@ import (
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/ref/mercato/scraper"
+	"github.com/nnti3n/voz-archive-plus/scraper"
+	"github.com/nnti3n/voz-archive-plus/utilities"
 )
 
 // Box is the model for the forum box
@@ -15,7 +16,7 @@ type Box struct {
 	url string
 	id  int
 
-	Threads []*Thread `json:"results"`
+	Threads []*Thread
 }
 
 // NewBox Loop through every item with a goRoutine
@@ -23,6 +24,7 @@ func NewBox() *Box {
 
 	g := new(Box)
 	g.url = "https://vozforums.com/forumdisplay.php?f=33"
+	fmt.Println(g.url)
 	g.Threads = g.getAsyncThreads()
 
 	return g
@@ -33,12 +35,15 @@ func (g *Box) getAsyncThreads() []*Thread {
 
 	// Start by scraping the forum box
 	s := g.fetchBox()
+	fmt.Printf("fetchBox %+v\n", s)
 
 	// Select all the threads in a box
-	pSelector := s.Find("#33 > tr")
+	pSelector := s.Find("#threadbits_forum_33 > tr")
+	fmt.Printf("pSelector %+v\n", pSelector)
 
 	// Count how many Thread there are in the page
 	pLen := pSelector.Size()
+	fmt.Println("pLen", pLen)
 
 	// This is the slice that will contain all our Threads
 	var p []*Thread
@@ -71,7 +76,6 @@ func (g *Box) fetchThreads(Threads chan *Thread, pSelector *goquery.Selection, p
 
 		title := s.Find("td:nth-child(2) > div:first-child > a:last-of-type")
 		source, _ := s.Find("td:nth-child(2)").Attr("title")
-		fmt.Println(title)
 		id, _ := title.Attr("href")
 		pageURL, _ := s.Find("td:nth-child(2) div:first-child span.smallfont a:last-child").Attr("href")
 		pageCount := "1"
@@ -79,11 +83,16 @@ func (g *Box) fetchThreads(Threads chan *Thread, pSelector *goquery.Selection, p
 			pageCount = strings.Split(pageURL, "page=")[1]
 		}
 
+		fmt.Print("ID ", utilities.ParseThreadURL(id), " ")
+		fmt.Print("title ", title.Text(), " ")
+		fmt.Print("source ", source, " ")
+		fmt.Print("pageCount ", pageCount, "\n", "\n")
+
 		// Fetch every Thread concurrently with
 		// a GoRoutine
 		go func(Threads chan *Thread) {
 			defer wg.Done()
-			Threads <- NewThread(id, title.Text(), source, pageCount)
+			Threads <- NewThread(utilities.ParseThreadURL(id), title.Text(), source, pageCount)
 
 		}(Threads)
 	})
@@ -93,6 +102,7 @@ func (g *Box) fetchThreads(Threads chan *Thread, pSelector *goquery.Selection, p
 
 func (g *Box) fetchBox() *scraper.Scraper {
 	s := scraper.NewScraper(g.url, "utf-8")
+	fmt.Println(s)
 
 	return s
 }

@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"math"
+	"strconv"
+	"strings"
 )
 
 // Round is a custom implementation for rounding values as
@@ -32,4 +34,10 @@ func JSONMarshal(v interface{}, safeEncoding bool) ([]byte, error) {
 		b = bytes.Replace(b, []byte("\\u0026"), []byte("&"), -1)
 	}
 	return b, err
+}
+
+// ParseThreadURL is a thread id filter function
+func ParseThreadURL(_url string) int {
+	url, _ := strconv.Atoi(strings.Split(_url, "t=")[1])
+	return url
 }

@@ -1,6 +1,7 @@
 package vozscrape
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -33,10 +34,10 @@ type Post struct {
 
 // NewThread creates a Thread and fills missing information
 // from the Thread page
-func NewThread(id string, title string, source string, pageCount string) *Thread {
+func NewThread(id int, title string, source string, pageCount string) *Thread {
 
 	t := new(Thread)
-	t.ID, _ = strconv.Atoi(strings.TrimSpace(id))
+	t.ID = id
 	t.Title = title
 	t.Source = source
 	t.PageCount, _ = strconv.Atoi(pageCount)
@@ -56,6 +57,7 @@ func (t *Thread) getPosts(pPage *scraper.Scraper) []*Post {
 		p := new(Post)
 		number := s.Find("tr:first-child td div:first-child a:first-child")
 		p.Number, _ = strconv.Atoi(number.Text())
+		fmt.Println("p.Number", p.Number)
 		_number, _ := number.Attr("href")
 		p.PostID, _ = strconv.Atoi(strings.Split(strings.Split(_number, "=")[1], "&")[0])
 

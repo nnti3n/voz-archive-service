@@ -1,12 +1,12 @@
 package scraper
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/djimenez/iconv-go"
 )
 
 // Scraper is an alias for goquery.Document. Reason for this
@@ -29,6 +29,7 @@ func NewScraper(url string, charset string) *Scraper {
 	s.contentLength = s.getContentLength()
 
 	// Setup and return our Document struct
+	fmt.Println("newScaper", s.doc)
 	return s
 }
 
@@ -39,9 +40,7 @@ func (s *Scraper) GetSizeInKB() string {
 	return strconv.FormatFloat(sizeInKb, 'f', 2, 64) + "kb"
 }
 
-// Find is just a wrapper for *goquery.Document().Find()
-// as this is part of an already tested library, we will
-// not build unit tests on this func
+// Find is a wrapper for *goquery.Document().Find()
 func (s *Scraper) Find(selector string) *goquery.Selection {
 	return s.doc.Find(selector)
 }
@@ -76,27 +75,32 @@ func (s *Scraper) getDocument() *goquery.Document {
 
 	// Convert the designated charset HTML to utf-8 encoded HTML.
 	// `charset` being one of the charsets known by the iconv package.
-	utfBody, err := iconv.NewReader(res.Body, s.charset, "utf-8")
+	// utfBody, err := iconv.NewReader(res.Body, s.charset, "utf-8")
+	// fmt.Println("utfBody", utfBody)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// use utfBody using goquery
+	doc, err := goquery.NewDocumentFromResponse(res)
+	fmt.Printf("doc from res %+v\n", doc)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// use utfBody using goquery
-	doc, err := goquery.NewDocumentFromReader(utfBody)
-	if err != nil {
-		log.Fatal(err)
-	}
 	return doc
 }
 
 func (s *Scraper) getResponse() *http.Response {
 	// Load the URL
 	res, err := http.Get(s.url)
+	fmt.Printf("res %+v\n", res)
 	if err != nil {
 		log.Fatal(err)
 	}
 	// Get the Header's content Length
 	s.contentLength = res.ContentLength
+	fmt.Println("contentLength", s.contentLength)
 
 	return res
 }
