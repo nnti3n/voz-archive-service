@@ -52,11 +52,14 @@ func NewThread(id int, title string, source string, pageCount string) *Thread {
 
 func (t *Thread) getPosts(pPage *scraper.Scraper) []*Post {
 	posts := []*Post{}
+	fmt.Println(pPage)
+	fmt.Println("postLen", pPage.Find("#posts > div [align='left']").Size())
 
-	pPage.Find("#posts > div").Each(func(i int, s *goquery.Selection) {
+	pPage.Find("#posts > div [align='left']").Each(func(i int, s *goquery.Selection) {
 		p := new(Post)
 		number := s.Find("tr:first-child td div:first-child a:first-child")
-		p.Number, _ = strconv.Atoi(number.Text())
+		numberName, _ := number.Attr("name")
+		p.Number, _ = strconv.Atoi(numberName)
 		fmt.Println("p.Number", p.Number)
 		_number, _ := number.Attr("href")
 		p.PostID, _ = strconv.Atoi(strings.Split(strings.Split(_number, "=")[1], "&")[0])
@@ -75,7 +78,7 @@ func (t *Thread) getPosts(pPage *scraper.Scraper) []*Post {
 
 func (t *Thread) fetchThread() *scraper.Scraper {
 
-	s := scraper.NewScraper("https://vozforums.com/showthread?t="+strconv.Itoa(t.ID), "utf-8")
+	s := scraper.NewScraper("https://vozforums.com/showthread.php?t="+strconv.Itoa(t.ID), "utf-8")
 	return s
 }
 
