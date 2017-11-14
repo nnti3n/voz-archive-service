@@ -1,7 +1,6 @@
 package scraper
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -29,7 +28,6 @@ func NewScraper(url string, charset string) *Scraper {
 	s.contentLength = s.getContentLength()
 
 	// Setup and return our Document struct
-	fmt.Println("newScaper", s.doc)
 	return s
 }
 
@@ -60,7 +58,7 @@ func (s *Scraper) getContentLength() int64 {
 		// get the raw html
 		html, err := s.doc.Html()
 		if err != nil {
-			log.Fatal(err)
+			log.Println("Cant get html ", err)
 		}
 		l = int64(len(html))
 	}
@@ -83,9 +81,8 @@ func (s *Scraper) getDocument() *goquery.Document {
 
 	// use utfBody using goquery
 	doc, err := goquery.NewDocumentFromResponse(res)
-	fmt.Printf("doc from res %+v\n", doc)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Error doc from res", err)
 	}
 
 	return doc
@@ -94,13 +91,11 @@ func (s *Scraper) getDocument() *goquery.Document {
 func (s *Scraper) getResponse() *http.Response {
 	// Load the URL
 	res, err := http.Get(s.url)
-	fmt.Printf("res %+v\n", res)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Error response", err)
 	}
 	// Get the Header's content Length
 	s.contentLength = res.ContentLength
-	fmt.Println("contentLength", s.contentLength)
 
 	return res
 }

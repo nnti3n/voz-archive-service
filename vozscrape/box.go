@@ -3,6 +3,8 @@ package vozscrape
 
 import (
 	"fmt"
+	"log"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -35,15 +37,13 @@ func (g *Box) getAsyncThreads() []*Thread {
 
 	// Start by scraping the forum box
 	s := g.fetchBox()
-	fmt.Printf("fetchBox %+v\n", s)
 
 	// Select all the threads in a box
 	pSelector := s.Find("#threadbits_forum_33 > tr")
-	fmt.Printf("pSelector %+v\n", pSelector)
 
 	// Count how many Thread there are in the page
 	pLen := pSelector.Size()
-	fmt.Println("pLen", pLen)
+	fmt.Println("Number of threads ", pLen)
 
 	// This is the slice that will contain all our Threads
 	var p []*Thread
@@ -75,18 +75,31 @@ func (g *Box) fetchThreads(Threads chan *Thread, pSelector *goquery.Selection, p
 	pSelector.Each(func(i int, s *goquery.Selection) {
 
 		title := s.Find("td:nth-child(2) > div:first-child > a:last-of-type")
-		source, _ := s.Find("td:nth-child(2)").Attr("title")
-		id, _ := title.Attr("href")
-		pageURL, _ := s.Find("td:nth-child(2) div:first-child span.smallfont a:last-child").Attr("href")
+		source, exist := s.Find("td:nth-child(2)").Attr("title")
+		if !exist {
+			log.Println("Not found source ", exist)
+		}
+		id, exist := title.Attr("href")
+		if !exist {
+			log.Println("Not found id", exist)
+		} else {
+			log.Println("id ", utilities.ParseThreadURL(id))
+		}
+		pageURL, exist := s.Find("a#thread_title_" + strconv.Itoa(utilities.ParseThreadURL(id))).Attr("href")
+		if !exist {
+			log.Println("Not found pageURL ", "#thread_title_"+strconv.Itoa(utilities.ParseThreadURL(id)))
+		} else {
+			log.Println("pageURLID ", "#thread_title_"+strconv.Itoa(utilities.ParseThreadURL(id)))
+		}
 		pageCount := "1"
 		if pageURL != "" {
 			pageCount = strings.Split(pageURL, "page=")[1]
 		}
 
-		fmt.Print("ID ", utilities.ParseThreadURL(id), " ")
-		fmt.Print("title ", title.Text(), " ")
-		fmt.Print("source ", source, " ")
-		fmt.Print("pageCount ", pageCount, "\n", "\n")
+		// fmt.Print("ID ", utilities.ParseThreadURL(id), " ")
+		// fmt.Print("title ", title.Text(), " ")
+		// fmt.Print("source ", source, " ")
+		// fmt.Print("pageCount ", pageCount, "\n", "\n")
 
 		// Fetch every Thread concurrently with
 		// a GoRoutine
