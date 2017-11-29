@@ -4,7 +4,6 @@ package vozscrape
 import (
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -28,6 +27,7 @@ func NewBox() *Box {
 	g.url = "https://vozforums.com/forumdisplay.php?f=33"
 	fmt.Println(g.url)
 	g.Threads = g.getAsyncThreads()
+	log.Println("G ", g)
 
 	return g
 }
@@ -82,17 +82,12 @@ func (g *Box) fetchThreads(Threads chan *Thread, pSelector *goquery.Selection, p
 		id, exist := title.Attr("href")
 		if !exist {
 			log.Println("Not found id", exist)
-		} else {
-			log.Println("id ", utilities.ParseThreadURL(id))
-		}
-		pageURL, exist := s.Find("a#thread_title_" + strconv.Itoa(utilities.ParseThreadURL(id))).Attr("href")
-		if !exist {
-			log.Println("Not found pageURL ", "#thread_title_"+strconv.Itoa(utilities.ParseThreadURL(id)))
-		} else {
-			log.Println("pageURLID ", "#thread_title_"+strconv.Itoa(utilities.ParseThreadURL(id)))
 		}
 		pageCount := "1"
-		if pageURL != "" {
+		pageURL, exist := s.Find("td:nth-child(2) div:first-child span.smallfont a:last-child").Attr("href")
+		if !exist {
+			log.Println("Not found pageURL PageCount 1")
+		} else {
 			pageCount = strings.Split(pageURL, "page=")[1]
 		}
 

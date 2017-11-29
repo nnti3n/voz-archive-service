@@ -58,7 +58,10 @@ func (t *Thread) getPosts(pPage *scraper.Scraper) []*Post {
 	pPage.Find("#posts > div [align='left']").Each(func(i int, s *goquery.Selection) {
 		p := new(Post)
 		number := s.Find("tr:first-child td div:first-child a:first-child")
-		numberName, _ := number.Attr("name")
+		numberName, exist := number.Attr("name")
+		if !exist {
+			fmt.Println("Not found name")
+		}
 		p.Number, _ = strconv.Atoi(numberName)
 		_number, _ := number.Attr("href")
 		p.PostID, _ = strconv.Atoi(strings.Split(strings.Split(_number, "=")[1], "&")[0])
