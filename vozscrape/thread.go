@@ -60,9 +60,11 @@ func (t *Thread) getPosts(pPage *scraper.Scraper) []*Post {
 		number := s.Find("tr:first-child td div:first-child a:first-child")
 		numberName, exist := number.Attr("name")
 		if !exist {
-			fmt.Println("Not found name")
+			fmt.Println("Not found name, replace -1")
+			numberName = "-1"
 		}
 		p.Number, _ = strconv.Atoi(numberName)
+		fmt.Println("p.Number", p.Number)
 		_number, _ := number.Attr("href")
 		p.PostID, _ = strconv.Atoi(strings.Split(strings.Split(_number, "=")[1], "&")[0])
 
@@ -70,6 +72,7 @@ func (t *Thread) getPosts(pPage *scraper.Scraper) []*Post {
 
 		username, _ := s.Find(".bigusername").Attr("href")
 		p.UserName = strings.Split(username, "u=")[1]
+		fmt.Println("p.UserName", p.UserName)
 
 		p.Content = strings.TrimSpace(s.Find(".voz-post-message").Text())
 
@@ -79,6 +82,7 @@ func (t *Thread) getPosts(pPage *scraper.Scraper) []*Post {
 		// fmt.Print(" p.Time ", p.Time)
 		// fmt.Println(" p.Content ", p.Content)
 
+		posts = append(posts, p)
 	})
 
 	return posts

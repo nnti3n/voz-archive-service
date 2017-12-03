@@ -39,23 +39,27 @@ func (g *Box) getAsyncThreads() []*Thread {
 	s := g.fetchBox()
 
 	// Select all the threads in a box
-	pSelector := s.Find("#threadbits_forum_33 > tr")
+	tSelector := s.Find("#threadbits_forum_33 > tr")
 
 	// Count how many Thread there are in the page
-	pLen := pSelector.Size()
-	fmt.Println("Number of threads ", pLen)
+	tLen := tSelector.Size()
+	fmt.Println("Number of threads ", tLen)
 
 	// This is the slice that will contain all our Threads
 	var p []*Thread
 
 	// Construct a slice of Post chan, make it
 	// of the size of the Posts found in the page
-	pChan := make(chan *Thread, pLen)
+	tChan := make(chan *Thread, tLen)
 
-	g.fetchThreads(pChan, pSelector, pLen)
+	g.fetchThreads(tChan, tSelector, tLen)
 
 	// Close the channel when the previous function is done
-	close(pChan)
+	close(tChan)
+
+	for i := range tChan {
+		p = append(p, i)
+	}
 
 	return p
 }
