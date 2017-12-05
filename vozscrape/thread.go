@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/ref/mercato/scraper"
+	"github.com/nnti3n/voz-archive-plus/scraper"
 )
 
 // Thread is the model for the forums threads
@@ -65,12 +65,18 @@ func (t *Thread) getPosts(pPage *scraper.Scraper) []*Post {
 		}
 		p.Number, _ = strconv.Atoi(numberName)
 		fmt.Println("p.Number", p.Number)
-		_number, _ := number.Attr("href")
+		_number, exist := number.Attr("href")
+		if !exist {
+			fmt.Print("no post href")
+		}
 		p.PostID, _ = strconv.Atoi(strings.Split(strings.Split(_number, "=")[1], "&")[0])
 
 		p.Time = strings.TrimSpace(s.Find("tr:first-child td.thead div:nth-child(2)").Text())
 
-		username, _ := s.Find(".bigusername").Attr("href")
+		username, exist := s.Find(".bigusername").Attr("href")
+		if !exist {
+			fmt.Println("not found bigusername href")
+		}
 		p.UserName = strings.Split(username, "u=")[1]
 		fmt.Println("p.UserName", p.UserName)
 

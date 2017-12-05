@@ -2,10 +2,15 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/nnti3n/voz-archive-plus/utilities"
 	"github.com/nnti3n/voz-archive-plus/vozscrape"
 )
+
+func init() {
+	log.SetFlags(log.LstdFlags | log.Llongfile)
+}
 
 // this is the console application
 func main() {
