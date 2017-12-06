@@ -94,6 +94,7 @@ func (g *Box) fetchThreads(Threads chan *Thread, pSelector *goquery.Selection, p
 		} else {
 			pageCount = strings.Split(pageURL, "page=")[1]
 		}
+		postCount := s.Find("td:nth-child(4) a").Text()
 
 		// fmt.Print("ID ", utilities.ParseThreadURL(id), " ")
 		// fmt.Print("title ", title.Text(), " ")
@@ -104,7 +105,7 @@ func (g *Box) fetchThreads(Threads chan *Thread, pSelector *goquery.Selection, p
 		// a GoRoutine
 		go func(Threads chan *Thread) {
 			defer wg.Done()
-			Threads <- NewThread(utilities.ParseThreadURL(id), title.Text(), source, pageCount)
+			Threads <- NewThread(utilities.ParseThreadURL(id), title.Text(), source, pageCount, postCount)
 
 		}(Threads)
 	})

@@ -34,13 +34,14 @@ type Post struct {
 
 // NewThread creates a Thread and fills missing information
 // from the Thread page
-func NewThread(id int, title string, source string, pageCount string) *Thread {
+func NewThread(id int, title string, source string, pageCount string, postCount string) *Thread {
 
 	t := new(Thread)
 	t.ID = id
 	t.Title = title
 	t.Source = source
 	t.PageCount, _ = strconv.Atoi(pageCount)
+	t.PostCount, _ = strconv.Atoi(postCount)
 
 	// Start scraping thread
 	tPage := t.fetchThread()
@@ -60,14 +61,15 @@ func (t *Thread) getPosts(pPage *scraper.Scraper) []*Post {
 		number := s.Find("tr:first-child td div:first-child a:first-child")
 		numberName, exist := number.Attr("name")
 		if !exist {
-			fmt.Println("Not found name, replace -1")
+			fmt.Println("Not found page number, set -1")
 			numberName = "-1"
 		}
 		p.Number, _ = strconv.Atoi(numberName)
 		fmt.Println("p.Number", p.Number)
 		_number, exist := number.Attr("href")
 		if !exist {
-			fmt.Print("no post href")
+			fmt.Println("no post href")
+			return
 		}
 		p.PostID, _ = strconv.Atoi(strings.Split(strings.Split(_number, "=")[1], "&")[0])
 
