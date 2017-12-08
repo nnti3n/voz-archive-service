@@ -11,19 +11,17 @@ import (
 
 // Thread is the model for the forums threads
 type Thread struct {
-	ID          int
-	Title       string
-	Source      string
-	PageCount   int
-	PostCount   int
-	LastUpdated string
+	ID        int
+	Title     string
+	Source    string
+	PageCount int
+	PostCount int
 
 	Posts []*Post
 }
 
-// Post is the struct for a single Post in the Grocery Store
+// Post is the struct for a single Post in thread
 type Post struct {
-	url      string
 	ID       int
 	Number   int
 	UserID   int
@@ -75,12 +73,13 @@ func (t *Thread) getPosts(pPage *scraper.Scraper) []*Post {
 
 		p.Time = strings.TrimSpace(s.Find("tr:first-child td.thead div:nth-child(2)").Text())
 
-		username, exist := s.Find(".bigusername").Attr("href")
+		userID, exist := s.Find(".bigusername").Attr("href")
 		if !exist {
-			fmt.Println("not found bigusername href")
+			fmt.Println("not found userID")
 		}
-		p.UserName = strings.Split(username, "u=")[1]
-		fmt.Println("p.UserName", p.UserName)
+		p.UserID, _ = strconv.Atoi(strings.Split(userID, "u=")[1])
+
+		p.UserName = strings.TrimSpace(s.Find(".bigusername").Text())
 
 		p.Content = strings.TrimSpace(s.Find(".voz-post-message").Text())
 
