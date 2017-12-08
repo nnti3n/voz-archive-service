@@ -24,7 +24,7 @@ type Thread struct {
 // Post is the struct for a single Post in the Grocery Store
 type Post struct {
 	url      string
-	PostID   int
+	ID       int
 	Number   int
 	UserID   int
 	UserName string
@@ -71,7 +71,7 @@ func (t *Thread) getPosts(pPage *scraper.Scraper) []*Post {
 			fmt.Println("no post href")
 			return
 		}
-		p.PostID, _ = strconv.Atoi(strings.Split(strings.Split(_number, "=")[1], "&")[0])
+		p.ID, _ = strconv.Atoi(strings.Split(strings.Split(_number, "=")[1], "&")[0])
 
 		p.Time = strings.TrimSpace(s.Find("tr:first-child td.thead div:nth-child(2)").Text())
 

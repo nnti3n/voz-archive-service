@@ -4,6 +4,7 @@ package vozscrape
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -14,8 +15,7 @@ import (
 
 // Box is the model for the forum box
 type Box struct {
-	url string
-	id  int
+	ID int
 
 	Threads []*Thread
 }
@@ -24,10 +24,8 @@ type Box struct {
 func NewBox() *Box {
 
 	g := new(Box)
-	g.url = "https://vozforums.com/forumdisplay.php?f=33"
-	fmt.Println(g.url)
+	g.ID = 33
 	g.Threads = g.getAsyncThreads()
-	log.Println("G ", g)
 
 	return g
 }
@@ -114,7 +112,7 @@ func (g *Box) fetchThreads(Threads chan *Thread, pSelector *goquery.Selection, p
 }
 
 func (g *Box) fetchBox() *scraper.Scraper {
-	s := scraper.NewScraper(g.url, "utf-8")
+	s := scraper.NewScraper("https://vozforums.com/forumdisplay.php?f="+strconv.Itoa(g.ID), "utf-8")
 	fmt.Println(s)
 
 	return s
