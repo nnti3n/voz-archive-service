@@ -16,6 +16,7 @@ type Thread struct {
 	Source    string
 	PageCount int
 	PostCount int
+	ViewCount int
 
 	Posts []*Post
 }
@@ -32,14 +33,15 @@ type Post struct {
 
 // NewThread creates a Thread and fills missing information
 // from the Thread page
-func NewThread(id int, title string, source string, pageCount string, postCount string) *Thread {
+func NewThread(id int, title string, source string, pageCount string, postCount string, viewCount string) *Thread {
 
 	t := new(Thread)
 	t.ID = id
 	t.Title = title
 	t.Source = source
-	t.PageCount, _ = strconv.Atoi(pageCount)
-	t.PostCount, _ = strconv.Atoi(postCount)
+	t.PageCount, _ = strconv.Atoi(strings.Replace(pageCount, ",", "", -1))
+	t.PostCount, _ = strconv.Atoi(strings.Replace(postCount, ",", "", -1))
+	t.ViewCount, _ = strconv.Atoi(strings.Replace(viewCount, ",", "", -1))
 
 	// Start scraping thread
 	tPage := t.fetchThread()
