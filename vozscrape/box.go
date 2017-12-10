@@ -15,9 +15,8 @@ import (
 
 // Box is the model for the forum box
 type Box struct {
-	ID int
-
-	Threads []*Thread
+	ID      int
+	Threads []*Thread `sql:"-"`
 }
 
 // NewBox Loop through every item with a goRoutine
@@ -105,7 +104,7 @@ func (g *Box) fetchThreads(Threads chan *Thread, pSelector *goquery.Selection, p
 		// a GoRoutine
 		go func(Threads chan *Thread) {
 			defer wg.Done()
-			Threads <- NewThread(utilities.ParseThreadURL(id), title.Text(), source, pageCount, postCount, viewCount)
+			Threads <- NewThread(utilities.ParseThreadURL(id), title.Text(), source, pageCount, postCount, viewCount, g.ID)
 
 		}(Threads)
 	})
@@ -115,7 +114,6 @@ func (g *Box) fetchThreads(Threads chan *Thread, pSelector *goquery.Selection, p
 
 func (g *Box) fetchBox() *scraper.Scraper {
 	s := scraper.NewScraper("https://vozforums.com/forumdisplay.php?f="+strconv.Itoa(g.ID), "utf-8")
-	fmt.Println(s)
 
 	return s
 }

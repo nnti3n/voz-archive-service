@@ -17,6 +17,7 @@ type Thread struct {
 	PageCount int
 	PostCount int
 	ViewCount int
+	BoxID     int
 
 	Posts []*Post
 }
@@ -29,11 +30,12 @@ type Post struct {
 	UserName string
 	Time     string
 	Content  string
+	ThreadID int
 }
 
 // NewThread creates a Thread and fills missing information
 // from the Thread page
-func NewThread(id int, title string, source string, pageCount string, postCount string, viewCount string) *Thread {
+func NewThread(id int, title string, source string, pageCount string, postCount string, viewCount string, boxID int) *Thread {
 
 	t := new(Thread)
 	t.ID = id
@@ -42,6 +44,7 @@ func NewThread(id int, title string, source string, pageCount string, postCount 
 	t.PageCount, _ = strconv.Atoi(strings.Replace(pageCount, ",", "", -1))
 	t.PostCount, _ = strconv.Atoi(strings.Replace(postCount, ",", "", -1))
 	t.ViewCount, _ = strconv.Atoi(strings.Replace(viewCount, ",", "", -1))
+	t.BoxID = boxID
 
 	// Start scraping thread
 	tPage := t.fetchThread()
@@ -65,7 +68,6 @@ func (t *Thread) getPosts(pPage *scraper.Scraper) []*Post {
 			numberName = "-1"
 		}
 		p.Number, _ = strconv.Atoi(numberName)
-		fmt.Println("p.Number", p.Number)
 		_number, exist := number.Attr("href")
 		if !exist {
 			fmt.Println("no post href")
@@ -84,6 +86,8 @@ func (t *Thread) getPosts(pPage *scraper.Scraper) []*Post {
 		p.UserName = strings.TrimSpace(s.Find(".bigusername").Text())
 
 		p.Content = strings.TrimSpace(s.Find(".voz-post-message").Text())
+
+		p.ThreadID = t.ID
 
 		// fmt.Print("p.PostID ", p.PostID)
 		// fmt.Print(" p.Number ", p.Number)

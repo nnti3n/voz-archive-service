@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/go-pg/pg"
 	"github.com/nnti3n/voz-archive-plus/utilities"
 	"github.com/nnti3n/voz-archive-plus/vozscrape"
 )
@@ -15,18 +16,16 @@ func init() {
 
 // this is the console application
 func main() {
-	// connStr := "user=nntien dbname=pqgotest sslmode=verify-full"
-	// db, err := sql.Open("postgres", connStr)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	fmt.Println(Box())
+	s := vozscrape.NewBox()
 	f, err := os.Create("json.txt")
 	check(err)
 
-	content := Box()
-	n3, err := f.WriteString(content)
-	fmt.Print("wrote %d bytes\n", n3)
+	content := serialStruct(s)
+	_, err = f.WriteString(content)
+	check(err)
+	fmt.Println("Wrote json.txt")
+
+	DbModel(s)
 }
 
 func check(e error) {
@@ -36,8 +35,29 @@ func check(e error) {
 }
 
 // Box will scape forum boxes
-func Box() string {
-	s := vozscrape.NewBox()
+func serialStruct(s *vozscrape.Box) string {
 	res2B, _ := utilities.JSONMarshal(s, true)
 	return string(res2B)
+}
+
+// DbModel will map model to db
+func DbModel(box *vozscrape.Box) {
+	db := pg.Connect(&pg.Options{
+		User:     "nntien",
+		Database: "vozarchive",
+	})
+
+	err := db.Insert(box)
+	for _, thread := range box.Threads {
+		err = db.Insert(thread)
+		for _, post := range thread.Posts {
+			if post.ID == 0 {
+				fmt.Println(post.Content)
+			}
+			err = db.Insert(post)
+		}
+	}
+	if err != nil {
+		panic(err)
+	}
 }

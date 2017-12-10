@@ -3,7 +3,6 @@ package utilities
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -29,7 +28,7 @@ func Round(val float64, roundOn float64, places int) (newVal float64) {
 func JSONMarshal(v interface{}, safeEncoding bool) ([]byte, error) {
 
 	b, err := json.Marshal(v)
-	fmt.Print("bResult", b)
+	// fmt.Print("bResult", b)
 
 	if safeEncoding {
 		b = bytes.Replace(b, []byte("\\u003c"), []byte("<"), -1)
