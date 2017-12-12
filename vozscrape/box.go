@@ -43,7 +43,7 @@ func (g *Box) getAsyncThreads() []*Thread {
 	fmt.Println("Number of threads ", tLen)
 
 	// This is the slice that will contain all our Threads
-	var p []*Thread
+	var t []*Thread
 
 	// Construct a slice of Post chan, make it
 	// of the size of the Posts found in the page
@@ -55,10 +55,10 @@ func (g *Box) getAsyncThreads() []*Thread {
 	close(tChan)
 
 	for i := range tChan {
-		p = append(p, i)
+		t = append(t, i)
 	}
 
-	return p
+	return t
 }
 
 // The function that will launch our GoRoutines: in order to prevent race conditions
