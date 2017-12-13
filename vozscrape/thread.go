@@ -2,11 +2,13 @@ package vozscrape
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/nnti3n/voz-archive-plus/scraper"
+	"github.com/nnti3n/voz-archive-plus/utilities"
 )
 
 // Thread is the model for the forums threads
@@ -33,6 +35,8 @@ type Post struct {
 	ThreadID int
 }
 
+var excludeThreads = []int{6735473, 6609261, 3613304, 2024506, 5523490}
+
 // NewThread creates a Thread and fills missing information
 // from the Thread page
 func NewThread(id int, title string, source string, pageCount string, postCount string, viewCount string, boxID int) *Thread {
@@ -46,6 +50,11 @@ func NewThread(id int, title string, source string, pageCount string, postCount 
 	t.ViewCount, _ = strconv.Atoi(strings.Replace(viewCount, ",", "", -1))
 	t.BoxID = boxID
 
+	if utilities.NumberInSlice(id, excludeThreads) {
+		log.Println("met", id)
+		return t
+	}
+
 	// Start scraping thread
 	tPage := t.fetchThread()
 
@@ -54,7 +63,7 @@ func NewThread(id int, title string, source string, pageCount string, postCount 
 	return t
 }
 
-func (t *Thread) getPosts(pPage []*scraper.Scraper) []*Post {
+func (t *Thread) getPosts(pPage []scraper.Scraper) []*Post {
 	posts := []*Post{}
 
 	for _, page := range pPage {
@@ -92,11 +101,12 @@ func (t *Thread) getPosts(pPage []*scraper.Scraper) []*Post {
 	return posts
 }
 
-func (t *Thread) fetchThread() []*scraper.Scraper {
-	s := []*scraper.Scraper{}
-	for i := 1; i < t.PageCount; i++ {
-		p := scraper.NewScraper("https://vozforums.com/showthread.php?t="+strconv.Itoa(t.ID)+"&page="+strconv.Itoa(t.PageCount), "utf-8")
-		s = append(s, p)
+func (t *Thread) fetchThread() []scraper.Scraper {
+	s := []scraper.Scraper{}
+	for i := 1; i <= t.PageCount; i++ {
+		p := scraper.NewScraper("https://vozforums.com/showthread.php?t="+strconv.Itoa(t.ID)+"&page="+strconv.Itoa(i), "utf-8")
+		log.Println(p)
+		s = append(s, *p)
 	}
 	return s
 }

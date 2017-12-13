@@ -43,3 +43,13 @@ func ParseThreadURL(_url string) int {
 	url, _ := strconv.Atoi(strings.Split(_url, "t=")[1])
 	return url
 }
+
+// NumberInSlice find number in a slice
+func NumberInSlice(a int, list []int) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}

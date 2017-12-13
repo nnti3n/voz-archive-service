@@ -69,10 +69,10 @@ func (g *Box) fetchThreads(Threads chan *Thread, pSelector *goquery.Selection, p
 	// We are telling to the WaitGroup
 	// how many items should be in the channel
 	// before it completes (the number is of course
-	// the total of our Posts)
+	// the total of our Threads)
 	wg.Add(pLen)
 
-	// Loop through every Post in the page
+	// Loop through every Thread in the page
 	pSelector.Each(func(i int, s *goquery.Selection) {
 
 		title := s.Find("td:nth-child(2) > div:first-child > a:last-of-type")
@@ -92,13 +92,7 @@ func (g *Box) fetchThreads(Threads chan *Thread, pSelector *goquery.Selection, p
 			pageCount = strings.Split(pageURL, "page=")[1]
 		}
 		postCount := s.Find("td:nth-child(4) a").Text()
-
 		viewCount := s.Find("td:nth-child(5)").Text()
-
-		// fmt.Print("ID ", utilities.ParseThreadURL(id), " ")
-		// fmt.Print("title ", title.Text(), " ")
-		// fmt.Print("source ", source, " ")
-		// fmt.Print("pageCount ", pageCount, "\n", "\n")
 
 		// Fetch every Thread concurrently with
 		// a GoRoutine
