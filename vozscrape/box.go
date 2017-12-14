@@ -20,26 +20,33 @@ type Box struct {
 }
 
 // NewBox Loop through every item with a goRoutine
-func NewBox() *Box {
+func NewBox(boxPage int) *Box {
 
-	g := new(Box)
-	g.ID = 33
-	g.Threads = g.getAsyncThreads()
+	b := new(Box)
+	b.ID = 33
+	b.Threads = b.getAsyncThreads(boxPage)
 
-	return g
+	return b
 }
 
 // Get all the Posts in the page with a goRoutine
-func (g *Box) getAsyncThreads() []*Thread {
+func (b *Box) getAsyncThreads(boxPage int) []*Thread {
 
 	// Start by scraping the forum box
-	s := g.fetchBox()
+	s := b.fetchBox(boxPage)
+
+	// Slice of thread selector
+	tPageSelector := []goquery.Selection{}
+	// Count how many Thread there are in the page
+	tLen := 0
 
 	// Select all the threads in a box
-	tSelector := s.Find("#threadbits_forum_33 > tr")
+	for _, box := range s {
+		threadSelector := box.Find("#threadbits_forum_33 > tr")
+		tLen += threadSelector.Size()
+		tPageSelector = append(tPageSelector, *threadSelector)
+	}
 
-	// Count how many Thread there are in the page
-	tLen := tSelector.Size()
 	fmt.Println("Number of threads ", tLen)
 
 	// This is the slice that will contain all our Threads
@@ -49,7 +56,7 @@ func (g *Box) getAsyncThreads() []*Thread {
 	// of the size of the Posts found in the page
 	tChan := make(chan *Thread, tLen)
 
-	g.fetchThreads(tChan, tSelector, tLen)
+	b.fetchThreads(tChan, tPageSelector, tLen)
 
 	// Close the channel when the previous function is done
 	close(tChan)
@@ -63,7 +70,7 @@ func (g *Box) getAsyncThreads() []*Thread {
 
 // The function that will launch our GoRoutines: in order to prevent race conditions
 // we will sync all of our routines
-func (g *Box) fetchThreads(Threads chan *Thread, pSelector *goquery.Selection, pLen int) {
+func (g *Box) fetchThreads(Threads chan *Thread, tPageSelector []goquery.Selection, pLen int) {
 	var wg sync.WaitGroup
 
 	// We are telling to the WaitGroup
@@ -73,41 +80,48 @@ func (g *Box) fetchThreads(Threads chan *Thread, pSelector *goquery.Selection, p
 	wg.Add(pLen)
 
 	// Loop through every Thread in the page
-	pSelector.Each(func(i int, s *goquery.Selection) {
+	for _, tSelector := range tPageSelector {
+		tSelector.Each(func(i int, s *goquery.Selection) {
 
-		title := s.Find("td:nth-child(2) > div:first-child > a:last-of-type")
-		source, exist := s.Find("td:nth-child(2)").Attr("title")
-		if !exist {
-			log.Println("Not found source ", exist)
-		}
-		id, exist := title.Attr("href")
-		if !exist {
-			log.Println("Not found id", exist)
-		}
-		pageCount := "1"
-		pageURL, exist := s.Find("td:nth-child(2) div:first-child span.smallfont a:last-child").Attr("href")
-		if !exist {
-			log.Println("Not found pageURL PageCount 1")
-		} else {
-			pageCount = strings.Split(pageURL, "page=")[1]
-		}
-		postCount := s.Find("td:nth-child(4) a").Text()
-		viewCount := s.Find("td:nth-child(5)").Text()
+			title := s.Find("td:nth-child(2) > div:first-child > a:last-of-type")
+			source, exist := s.Find("td:nth-child(2)").Attr("title")
+			if !exist {
+				log.Println("Not found source ", exist)
+			}
+			id, exist := title.Attr("href")
+			if !exist {
+				log.Println("Not found id", exist)
+			}
+			pageCount := "1"
+			pageURL, exist := s.Find("td:nth-child(2) div:first-child span.smallfont a:last-child").Attr("href")
+			if !exist {
+				log.Println("Not found pageURL PageCount 1")
+			} else {
+				pageCount = strings.Split(pageURL, "page=")[1]
+			}
+			postCount := s.Find("td:nth-child(4) a").Text()
+			viewCount := s.Find("td:nth-child(5)").Text()
 
-		// Fetch every Thread concurrently with
-		// a GoRoutine
-		go func(Threads chan *Thread) {
-			defer wg.Done()
-			Threads <- NewThread(utilities.ParseThreadURL(id), title.Text(), source, pageCount, postCount, viewCount, g.ID)
+			// Fetch every Thread concurrently with
+			// a GoRoutine
+			go func(Threads chan *Thread) {
+				defer wg.Done()
+				Threads <- NewThread(utilities.ParseThreadURL(id), title.Text(), source, pageCount, postCount, viewCount, g.ID)
 
-		}(Threads)
-	})
+			}(Threads)
+		})
+	}
 
 	wg.Wait()
 }
 
-func (g *Box) fetchBox() *scraper.Scraper {
-	s := scraper.NewScraper("https://vozforums.com/forumdisplay.php?f="+strconv.Itoa(g.ID), "utf-8")
+func (b *Box) fetchBox(boxPage int) []scraper.Scraper {
+	s := []scraper.Scraper{}
+	for i := 1; i <= boxPage; i++ {
+		t := scraper.NewScraper("https://vozforums.com/forumdisplay.php?f="+strconv.Itoa(b.ID)+"&page="+strconv.Itoa(boxPage), "utf-8")
+		log.Println(t)
+		s = append(s, *t)
+	}
 
 	return s
 }

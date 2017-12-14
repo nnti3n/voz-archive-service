@@ -21,7 +21,7 @@ type Thread struct {
 	ViewCount int
 	BoxID     int
 
-	Posts []*Post
+	Posts []*Post `sql:"-"`
 }
 
 // Post is the struct for a single Post in thread

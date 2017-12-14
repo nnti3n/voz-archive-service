@@ -16,7 +16,7 @@ func init() {
 
 // this is the console application
 func main() {
-	s := vozscrape.NewBox()
+	s := vozscrape.NewBox(10)
 	f, err := os.Create("json.txt")
 	check(err)
 
