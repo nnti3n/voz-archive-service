@@ -16,7 +16,7 @@ func init() {
 
 // this is the console application
 func main() {
-	s := vozscrape.NewBox(10)
+	s := vozscrape.NewBox(5)
 	f, err := os.Create("json.txt")
 	check(err)
 
@@ -47,14 +47,15 @@ func DbModel(box *vozscrape.Box) {
 		Database: "vozarchive",
 	})
 
-	err := db.Insert(box)
+	_, err := db.Model(box).
+		OnConflict("DO NOTHING").Insert()
 	for _, thread := range box.Threads {
+		_, err = db.Model(thread).
+			OnConflict("DO NOTHING").Insert()
 		err = db.Insert(thread)
 		for _, post := range thread.Posts {
-			if post.ID == 0 {
-				fmt.Println(post.Content)
-			}
-			err = db.Insert(post)
+			_, err = db.Model(post).
+				OnConflict("DO NOTHING").Insert()
 		}
 	}
 	if err != nil {

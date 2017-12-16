@@ -13,13 +13,15 @@ import (
 
 // Thread is the model for the forums threads
 type Thread struct {
-	ID        int
-	Title     string
-	Source    string
-	PageCount int
-	PostCount int
-	ViewCount int
-	BoxID     int
+	ID              int
+	Title           string
+	Source          string
+	PageCount       int
+	PostCount       int
+	ViewCount       int
+	BoxID           int
+	UserIDStarter   int
+	UserNameStarter string
 
 	Posts []*Post `sql:"-"`
 }
@@ -39,11 +41,13 @@ var excludeThreads = []int{6735473, 6609261, 3613304, 2024506, 5523490}
 
 // NewThread creates a Thread and fills missing information
 // from the Thread page
-func NewThread(id int, title string, source string, pageCount string, postCount string, viewCount string, boxID int) *Thread {
+func NewThread(id int, title string, userID int, userName string, source string, pageCount string, postCount string, viewCount string, boxID int) *Thread {
 
 	t := new(Thread)
 	t.ID = id
 	t.Title = title
+	t.UserIDStarter = userID
+	t.UserNameStarter = userName
 	t.Source = source
 	t.PageCount, _ = strconv.Atoi(strings.Replace(pageCount, ",", "", -1))
 	t.PostCount, _ = strconv.Atoi(strings.Replace(postCount, ",", "", -1))
@@ -106,7 +110,7 @@ func (t *Thread) fetchThread() []scraper.Scraper {
 	s := []scraper.Scraper{}
 	for i := 1; i <= t.PageCount; i++ {
 		p := scraper.NewScraper("https://vozforums.com/showthread.php?t="+strconv.Itoa(t.ID)+"&page="+strconv.Itoa(i), "utf-8")
-		log.Println(p)
+		// log.Println(p)
 		s = append(s, *p)
 	}
 	return s

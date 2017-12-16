@@ -4,6 +4,7 @@ package vozscrape
 import (
 	"fmt"
 	"log"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -84,6 +85,13 @@ func (b *Box) fetchThreads(Threads chan *Thread, tPageSelector []goquery.Selecti
 		tSelector.Each(func(i int, s *goquery.Selection) {
 
 			title := s.Find("td:nth-child(2) > div:first-child > a:last-of-type")
+			// userID := -1
+			_userID, exist := s.Find("td:nth-child(2) > .smallfont span:last-child").Attr("onclick")
+			rUserID := regexp.MustCompile(`[\d]+`)
+			userID, _ := strconv.Atoi(rUserID.FindString(_userID))
+
+			userName := s.Find("td:nth-child(2) > .smallfont span").Text()
+
 			source, exist := s.Find("td:nth-child(2)").Attr("title")
 			if !exist {
 				log.Println("Not found source ", exist)
@@ -106,7 +114,7 @@ func (b *Box) fetchThreads(Threads chan *Thread, tPageSelector []goquery.Selecti
 			// a GoRoutine
 			go func(Threads chan *Thread) {
 				defer wg.Done()
-				Threads <- NewThread(utilities.ParseThreadURL(id), title.Text(), source, pageCount, postCount, viewCount, b.ID)
+				Threads <- NewThread(utilities.ParseThreadURL(id), title.Text(), userID, userName, source, pageCount, postCount, viewCount, b.ID)
 
 			}(Threads)
 		})
@@ -119,7 +127,7 @@ func (b *Box) fetchBox(boxPage int) []scraper.Scraper {
 	s := []scraper.Scraper{}
 	for i := 1; i <= boxPage; i++ {
 		t := scraper.NewScraper("https://vozforums.com/forumdisplay.php?f="+strconv.Itoa(b.ID)+"&page="+strconv.Itoa(i), "utf-8")
-		log.Println(t)
+		// log.Println(t)
 		s = append(s, *t)
 	}
 
