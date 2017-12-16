@@ -70,7 +70,7 @@ func (b *Box) getAsyncThreads(boxPage int) []*Thread {
 
 // The function that will launch our GoRoutines: in order to prevent race conditions
 // we will sync all of our routines
-func (g *Box) fetchThreads(Threads chan *Thread, tPageSelector []goquery.Selection, pLen int) {
+func (b *Box) fetchThreads(Threads chan *Thread, tPageSelector []goquery.Selection, pLen int) {
 	var wg sync.WaitGroup
 
 	// We are telling to the WaitGroup
@@ -106,7 +106,7 @@ func (g *Box) fetchThreads(Threads chan *Thread, tPageSelector []goquery.Selecti
 			// a GoRoutine
 			go func(Threads chan *Thread) {
 				defer wg.Done()
-				Threads <- NewThread(utilities.ParseThreadURL(id), title.Text(), source, pageCount, postCount, viewCount, g.ID)
+				Threads <- NewThread(utilities.ParseThreadURL(id), title.Text(), source, pageCount, postCount, viewCount, b.ID)
 
 			}(Threads)
 		})
@@ -118,7 +118,7 @@ func (g *Box) fetchThreads(Threads chan *Thread, tPageSelector []goquery.Selecti
 func (b *Box) fetchBox(boxPage int) []scraper.Scraper {
 	s := []scraper.Scraper{}
 	for i := 1; i <= boxPage; i++ {
-		t := scraper.NewScraper("https://vozforums.com/forumdisplay.php?f="+strconv.Itoa(b.ID)+"&page="+strconv.Itoa(boxPage), "utf-8")
+		t := scraper.NewScraper("https://vozforums.com/forumdisplay.php?f="+strconv.Itoa(b.ID)+"&page="+strconv.Itoa(i), "utf-8")
 		log.Println(t)
 		s = append(s, *t)
 	}
