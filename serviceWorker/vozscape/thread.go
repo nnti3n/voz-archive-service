@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/nnti3n/voz-archive-plus/scraper"
+	"github.com/nnti3n/voz-archive-plus/serviceWorker/scraper"
 	"github.com/nnti3n/voz-archive-plus/utilities"
 )
 
@@ -72,7 +72,7 @@ func (t *Thread) getPosts(pPage []scraper.Scraper) []*Post {
 			number := s.Find("tr:first-child td div:first-child a:first-child")
 			numberName, exist := number.Attr("name")
 			if !exist {
-				fmt.Println("Not found page number, set -1")
+				fmt.Println("Not found post number, set -1")
 				numberName = "-1"
 			}
 			p.Number, _ = strconv.Atoi(numberName)

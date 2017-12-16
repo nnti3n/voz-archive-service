@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/nnti3n/voz-archive-plus/scraper"
+	"github.com/nnti3n/voz-archive-plus/serviceWorker/scraper"
 	"github.com/nnti3n/voz-archive-plus/utilities"
 )
 
