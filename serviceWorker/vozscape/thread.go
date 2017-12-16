@@ -82,14 +82,15 @@ func (t *Thread) getPosts(pPage []scraper.Scraper) []*Post {
 				return
 			}
 			p.ID, _ = strconv.Atoi(strings.Split(strings.Split(_number, "=")[1], "&")[0])
-
 			p.Time = strings.TrimSpace(s.Find("tr:first-child td.thead div:nth-child(2)").Text())
 
 			userID, exist := s.Find(".bigusername").Attr("href")
 			if !exist {
 				fmt.Println("not found userID")
+				p.UserID = -1
+			} else {
+				p.UserID, _ = strconv.Atoi(strings.Split(userID, "u=")[1])
 			}
-			p.UserID, _ = strconv.Atoi(strings.Split(userID, "u=")[1])
 			p.UserName = strings.TrimSpace(s.Find(".bigusername").Text())
 			p.Content = strings.TrimSpace(s.Find(".voz-post-message").Text())
 			p.ThreadID = t.ID
