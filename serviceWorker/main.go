@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/go-pg/pg"
-	"github.com/nnti3n/voz-archive-plus/serviceWorker/vozscape"
+	"github.com/nnti3n/voz-archive-plus/serviceWorker/vozscrape"
 	"github.com/nnti3n/voz-archive-plus/utilities"
 )
 
