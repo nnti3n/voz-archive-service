@@ -22,7 +22,6 @@ func (e *Env) FetchAllThread(c *gin.Context) {
 
 	threads := []vozscrape.Thread{}
 	err := e.Db.Model(&threads).Where("box_id = ?", boxID).Limit(20).Select()
-	log.Println(c.Param("boxID"))
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"data":   threads,
@@ -39,14 +38,15 @@ func (e *Env) FetchAllThread(c *gin.Context) {
 
 // FetchSingleThread fetch all posts of thread
 func (e *Env) FetchSingleThread(c *gin.Context) {
-	threadID, err := strconv.Atoi(c.Param("ThreadID"))
+	threadID, _ := strconv.Atoi(c.Param("threadID"))
+	log.Println(c.Param("threadID"))
 
-	thread := vozscrape.Thread{ID: 6778933}
-	err = e.Db.Select(&thread)
+	thread := vozscrape.Thread{ID: threadID}
+	err := e.Db.Select(&thread)
 
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{
-			"querydata": threadID,
+			"querydata": thread,
 			"data":      thread,
 		})
 	} else {
