@@ -1,0 +1,9 @@
+{
+    "path": "interface/",
+    "port": 3000,
+    "isDevelopment": "true",
+    "databaseURL": "localhost",
+    "databaseName": "happy",
+    "databasePort": 5432,
+    "databaseUser": "nntien"
+}
