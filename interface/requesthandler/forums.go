@@ -21,7 +21,7 @@ func (e *Env) FetchAllThread(c *gin.Context) {
 	boxID := c.Param("boxID")
 
 	threads := []vozscrape.Thread{}
-	err := e.Db.Model(&threads).Limit(20).Select()
+	err := e.Db.Model(&threads).Where("box_id = ?", boxID).Limit(20).Select()
 	log.Println(c.Param("boxID"))
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -30,7 +30,7 @@ func (e *Env) FetchAllThread(c *gin.Context) {
 		})
 	} else {
 		c.JSON(http.StatusNoContent, gin.H{
-			"data":   threads,
+			"data":   []string{},
 			"params": boxID,
 		})
 	}
@@ -46,12 +46,12 @@ func (e *Env) FetchSingleThread(c *gin.Context) {
 
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{
-			"err":       err,
 			"querydata": threadID,
 			"data":      thread,
 		})
 	} else {
 		c.JSON(http.StatusNoContent, gin.H{
+			"err":       err,
 			"querydata": threadID,
 			"data":      []string{},
 		})
