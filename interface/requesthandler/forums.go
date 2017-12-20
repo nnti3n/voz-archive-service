@@ -46,8 +46,26 @@ func (e *Env) FetchSingleThread(c *gin.Context) {
 
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{
-			"querydata": thread,
-			"data":      thread,
+			"data": thread,
+		})
+	} else {
+		c.JSON(http.StatusNoContent, gin.H{
+			"err":  err,
+			"data": []string{},
+		})
+	}
+}
+
+// FetchThreadPosts fetch all posts of thread
+func (e *Env) FetchThreadPosts(c *gin.Context) {
+	threadID, _ := strconv.Atoi(c.Param("threadID"))
+
+	posts := []vozscrape.Post{}
+	err := e.Db.Model(&posts).Where("thread_id = ?", threadID).Limit(20).Select()
+
+	if err == nil {
+		c.JSON(http.StatusOK, gin.H{
+			"data": posts,
 		})
 	} else {
 		c.JSON(http.StatusNoContent, gin.H{

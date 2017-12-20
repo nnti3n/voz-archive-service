@@ -59,7 +59,7 @@ func main() {
 		// r.GET("/box", fetchAllBox)
 		r.GET("/box/:boxID", env.FetchAllThread)
 		r.GET("/thread/:threadID", env.FetchSingleThread)
-		// r.GET("/post/:postID", fetchSinglePost)
+		r.GET("/thread/:threadID/posts", env.FetchThreadPosts)
 	}
 	router.Run()
 }
