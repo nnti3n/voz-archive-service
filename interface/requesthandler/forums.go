@@ -62,9 +62,11 @@ func (e *Env) FetchSingleThread(c *gin.Context) {
 // FetchThreadPosts fetch all posts of thread
 func (e *Env) FetchThreadPosts(c *gin.Context) {
 	threadID, _ := strconv.Atoi(c.Param("threadID"))
+	limit, offset := utilities.Pagination(c, 20)
 
 	posts := []vozscrape.Post{}
-	err := e.Db.Model(&posts).Where("thread_id = ?", threadID).Limit(20).Select()
+	err := e.Db.Model(&posts).Where("thread_id = ?", threadID).
+		Offset(offset).Limit(limit).Order("number ASC").Select()
 
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{
