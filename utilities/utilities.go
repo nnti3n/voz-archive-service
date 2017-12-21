@@ -6,6 +6,8 @@ import (
 	"math"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 // Round is a custom implementation for rounding values as
@@ -52,4 +54,19 @@ func NumberInSlice(a int, list []int) bool {
 		}
 	}
 	return false
+}
+
+// Pagination help
+func Pagination(ctx *gin.Context, defaultLimit int) (limit int, offset int) {
+	limit = intOr(ctx.Query("limit"), defaultLimit)
+	offset, _ = strconv.Atoi(ctx.Query("offset"))
+	return
+}
+
+func intOr(str string, defaultValue int) int {
+	v, _ := strconv.Atoi(str)
+	if v == 0 {
+		return defaultValue
+	}
+	return v
 }
