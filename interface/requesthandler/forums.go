@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-pg/pg"
 	"github.com/nnti3n/voz-archive-plus/serviceWorker/vozscrape"
+	"github.com/nnti3n/voz-archive-plus/utilities"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,9 +20,11 @@ type Env struct {
 // FetchAllThread fetch all threads
 func (e *Env) FetchAllThread(c *gin.Context) {
 	boxID := c.Param("boxID")
+	limit, offset := utilities.Pagination(c, 20)
 
 	threads := []vozscrape.Thread{}
-	err := e.Db.Model(&threads).Where("box_id = ?", boxID).Limit(20).Select()
+	err := e.Db.Model(&threads).Where("box_id = ?", boxID).
+		Offset(offset).Limit(limit).Order("id ASC").Select()
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"data":   threads,
