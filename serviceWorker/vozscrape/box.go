@@ -10,9 +10,15 @@ import (
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/go-pg/pg"
 	"github.com/nnti3n/voz-archive-plus/serviceWorker/scraper"
 	"github.com/nnti3n/voz-archive-plus/utilities"
 )
+
+var db = pg.Connect(&pg.Options{
+	User:     "nntien",
+	Database: "vozarchive",
+})
 
 // Box is the model for the forum box
 type Box struct {
@@ -42,8 +48,8 @@ func (b *Box) getAsyncThreads(boxPage int) []*Thread {
 	tLen := 0
 
 	// Select all the threads in a box
-	for _, box := range s {
-		threadSelector := box.Find("#threadbits_forum_33 > tr")
+	for _, page := range s {
+		threadSelector := page.Find("#threadbits_forum_33 > tr")
 		tLen += threadSelector.Size()
 		tPageSelector = append(tPageSelector, *threadSelector)
 	}

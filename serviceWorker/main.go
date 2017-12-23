@@ -51,7 +51,9 @@ func DbModel(box *vozscrape.Box) {
 		OnConflict("DO NOTHING").Insert()
 	for _, thread := range box.Threads {
 		_, err = db.Model(thread).
-			OnConflict("DO NOTHING").Insert()
+			OnConflict("(id) DO UPDATE").
+			Set("page_count = ?page_count, post_count = ?post_count, view_count = ?view_count").
+			Insert()
 		err = db.Insert(thread)
 		for _, post := range thread.Posts {
 			_, err = db.Model(post).

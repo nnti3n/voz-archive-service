@@ -59,8 +59,18 @@ func NewThread(id int, title string, userID int, userName string, source string,
 		return t
 	}
 
+	thread := Thread{}
+	err := db.Model(&thread).Where("id = ?", id).Select()
+	if err != nil {
+		thread.PageCount = 1
+	}
+	if thread.PostCount == t.PostCount {
+		log.Println("same postcount", id)
+		return t
+	}
+
 	// Start scraping thread
-	tPage := t.fetchThread()
+	tPage := t.fetchThread(thread.PageCount)
 
 	t.Posts = t.getPosts(tPage)
 
@@ -106,12 +116,17 @@ func (t *Thread) getPosts(pPage []scraper.Scraper) []*Post {
 	return posts
 }
 
-func (t *Thread) fetchThread() []scraper.Scraper {
+func (t *Thread) fetchThread(currentPageCount int) []scraper.Scraper {
 	s := []scraper.Scraper{}
-	for i := 1; i <= t.PageCount; i++ {
+	i := 1
+	if t.PageCount >= currentPageCount {
+		i = currentPageCount
+		log.Println("Count", currentPageCount, t.PageCount)
+	}
+	for i <= t.PageCount {
 		p := scraper.NewScraper("https://vozforums.com/showthread.php?t="+strconv.Itoa(t.ID)+"&page="+strconv.Itoa(i), "utf-8")
-		// log.Println(p)
 		s = append(s, *p)
+		i++
 	}
 	return s
 }
