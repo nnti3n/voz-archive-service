@@ -3,6 +3,7 @@ package main
 import (
 	// "fmt"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg"
 	"github.com/nnti3n/voz-archive-plus/interface/requesthandler"
@@ -53,6 +54,7 @@ func main() {
 	})
 
 	router := gin.Default()
+	router.Use(cors.Default())
 	env := requesthandler.Env{Db: db}
 	r := router.Group("/api")
 	{
