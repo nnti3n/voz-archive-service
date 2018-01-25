@@ -39,7 +39,7 @@ func (e *Env) FetchAllThread(c *gin.Context) {
 
 }
 
-// FetchSingleThread fetch all posts of thread
+// FetchSingleThread fetch info of single thread
 func (e *Env) FetchSingleThread(c *gin.Context) {
 	threadID, _ := strconv.Atoi(c.Param("threadID"))
 	log.Println(c.Param("threadID"))
@@ -53,8 +53,9 @@ func (e *Env) FetchSingleThread(c *gin.Context) {
 		})
 	} else {
 		c.JSON(http.StatusNoContent, gin.H{
-			"err":  err,
-			"data": []string{},
+			"err":    err,
+			"params": threadID,
+			"data":   []string{},
 		})
 	}
 }
@@ -70,13 +71,14 @@ func (e *Env) FetchThreadPosts(c *gin.Context) {
 
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{
-			"data": posts,
+			"data":   posts,
+			"params": threadID,
 		})
 	} else {
 		c.JSON(http.StatusNoContent, gin.H{
-			"err":       err,
-			"querydata": threadID,
-			"data":      []string{},
+			"err":    err,
+			"params": threadID,
+			"data":   []string{},
 		})
 	}
 }
