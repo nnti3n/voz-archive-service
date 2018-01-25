@@ -1,2 +1,3 @@
-Voz archiver plus: a Vozforums's scaper in Go
-=====
+#Voz archiver plus
+
+Vozforumss archive service written in Go
