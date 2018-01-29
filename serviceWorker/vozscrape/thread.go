@@ -106,7 +106,8 @@ func (t *Thread) getPosts(pPage []scraper.Scraper) []*Post {
 				p.UserID, _ = strconv.Atoi(strings.Split(userID, "u=")[1])
 			}
 			p.UserName = strings.TrimSpace(s.Find(".bigusername").Text())
-			p.Content = strings.TrimSpace(s.Find(".voz-post-message").Text())
+			_content, _ := s.Find(".voz-post-message").Html()
+			p.Content = strings.TrimSpace(_content)
 			p.ThreadID = t.ID
 
 			posts = append(posts, p)
