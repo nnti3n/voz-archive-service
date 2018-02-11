@@ -2,6 +2,7 @@ package requesthandler
 
 import (
 	"log"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -36,14 +37,20 @@ func (f *ThreadFilter) threadFilter(q *orm.Query) (*orm.Query, error) {
 func (e *Env) FetchAllThread(c *gin.Context) {
 	var filter ThreadFilter
 	filter.Pager.SetURLValues(c.Request.URL.Query())
-	filter.BoxID, _ = strconv.Atoi(c.Param("boxID"))
+	boxID, _ := strconv.Atoi(c.Param("boxID"))
+	filter.BoxID = boxID
 
 	threads := []vozscrape.Thread{}
-	err := e.Db.Model(&threads).Apply(filter.threadFilter).Select()
+	count, err := e.Db.Model(&threads).Apply(filter.threadFilter).SelectAndCount()
+	pageCount := count / 10
+	if math.Mod(float64(count), 10) > 0 {
+		pageCount = count/10 + 1
+	}
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"data":   threads,
 			"params": filter.BoxID,
+			"page":   pageCount,
 		})
 	} else {
 		c.JSON(http.StatusNoContent, gin.H{
@@ -91,17 +98,23 @@ func (f *PostFilter) postFilter(q *orm.Query) (*orm.Query, error) {
 
 // FetchThreadPosts fetch all posts of thread
 func (e *Env) FetchThreadPosts(c *gin.Context) {
+	threadID, _ := strconv.Atoi(c.Param("threadID"))
 	var filter PostFilter
 	filter.Pager.SetURLValues(c.Request.URL.Query())
-	filter.ThreadID, _ = strconv.Atoi(c.Param("threadID"))
+	filter.ThreadID = threadID
 
 	posts := []vozscrape.Post{}
-	err := e.Db.Model(&posts).Apply(filter.postFilter).Select()
+	count, err := e.Db.Model(&posts).Apply(filter.postFilter).SelectAndCount()
+	pageCount := count / 10
+	if math.Mod(float64(count), 10) > 0 {
+		pageCount = count/10 + 1
+	}
 
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"data":   posts,
 			"params": filter.ThreadID,
+			"page":   pageCount,
 		})
 	} else {
 		c.JSON(http.StatusNoContent, gin.H{
