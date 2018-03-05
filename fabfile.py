@@ -1,6 +1,7 @@
 from fabric.api import *
 
-env.hosts = ['ec2-user@ec2-54-169-119-62.ap-southeast-1.compute.amazonaws.com']
+env.hosts = ['aws']
+env.use_ssh_config = True
 
 def deploy():
     code_dir = '/home/ec2-user/projects/src/github.com/nnti3n/voz-archive-plus'
@@ -10,3 +11,7 @@ def deploy():
     with cd(code_dir):
         run("git pull")
         run("dep ensure")
+    with cd(code_dir + "/serviceWorker"):
+        run("go install")
+    with cd(code_dir + "/interface"):
+        run("go install")
