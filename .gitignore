@@ -1,3 +1,7 @@
 .vscode/
 debug
 json.txt
+db/dbconfig.yml
+.env
+vendor
+*.pyc

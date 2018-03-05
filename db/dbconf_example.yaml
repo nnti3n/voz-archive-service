@@ -1,0 +1,6 @@
+development:
+    driver: postgres
+    open: user=$USERNAME dbname=$DBNAME sslmode=disable
+production:
+    driver: postgres
+    open: user=$USERNAME dbname=$DBNAME sslmode=disable

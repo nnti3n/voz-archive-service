@@ -1,3 +1,6 @@
 development:
     driver: postgres
     open: user=nntien dbname=vozarchive sslmode=disable
+production:
+    driver: postgres
+    open: user=nntien dbname=voz_archive password=dragonquest sslmode=disable
