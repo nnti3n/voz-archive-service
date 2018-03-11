@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/go-pg/pg"
-	"github.com/nnti3n/voz-archive-plus/serviceWorker/vozscrape"
-	"github.com/nnti3n/voz-archive-plus/utilities"
+	"github.com/nnti3n/voz-archive-service/serviceWorker/vozscrape"
+	"github.com/nnti3n/voz-archive-service/utilities"
 )
 
 func init() {

@@ -6,7 +6,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg"
-	"github.com/nnti3n/voz-archive-plus/interface/requesthandler"
+	"github.com/nnti3n/voz-archive-service/interface/requesthandler"
 	// "github.com/pkg/errors"
 )
 

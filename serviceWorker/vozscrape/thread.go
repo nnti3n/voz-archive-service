@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/nnti3n/voz-archive-plus/serviceWorker/scraper"
-	"github.com/nnti3n/voz-archive-plus/utilities"
+	"github.com/nnti3n/voz-archive-service/serviceWorker/scraper"
+	"github.com/nnti3n/voz-archive-service/utilities"
 )
 
 // Thread is the model for the forums threads

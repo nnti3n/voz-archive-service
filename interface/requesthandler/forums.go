@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
-	"github.com/nnti3n/voz-archive-plus/serviceWorker/vozscrape"
+	"github.com/nnti3n/voz-archive-service/serviceWorker/vozscrape"
 
 	"github.com/gin-gonic/gin"
 )

@@ -11,8 +11,8 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/go-pg/pg"
-	"github.com/nnti3n/voz-archive-plus/serviceWorker/scraper"
-	"github.com/nnti3n/voz-archive-plus/utilities"
+	"github.com/nnti3n/voz-archive-service/serviceWorker/scraper"
+	"github.com/nnti3n/voz-archive-service/utilities"
 )
 
 var db = pg.Connect(&pg.Options{
