@@ -61,6 +61,12 @@
   revision = "1c35d901db3da928c72a72d8458480cc9ade058f"
 
 [[projects]]
+  name = "github.com/joho/godotenv"
+  packages = ["."]
+  revision = "a79fa1e548e2c689c241d10173efd51e5d689d5b"
+  version = "v1.2.0"
+
+[[projects]]
   name = "github.com/mattn/go-isatty"
   packages = ["."]
   revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
@@ -102,6 +108,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "0a30b31e0b06faa7aed9a8b221efc0c9b1ac2c86758c6f79a322d9af63e89037"
+  inputs-digest = "d46d280a5dbe8fc1856a9a113012648e06232c6865a1460dd5885f421d73ac24"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -3,54 +3,43 @@ package main
 import (
 	// "fmt"
 
+	"flag"
+	"log"
+	"os"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg"
+	"github.com/joho/godotenv"
 	"github.com/nnti3n/voz-archive-service/interface/requesthandler"
 	// "github.com/pkg/errors"
 )
 
-// func LoadConfiguration(pwd string) error {
-// 	viper.SetConfigName("voz-config")
-// 	viper.AddConfigPath(pwd)
-// 	devPath := pwd[:len(pwd)-3] + "interface/"
-// 	_, file, _, _ := runtime.Caller(1)
-// 	configPath := path.Dir(file)
-// 	viper.AddConfigPath(devPath)
-// 	viper.AddConfigPath(configPath)
-// 	return viper.ReadInConfig() // Find and read the config file
-// }
+var dev string
+
+func init() {
+	flag.StringVar(&dev, "dev", "true", "build for local dev")
+}
 
 func main() {
-	// flag.Parse()
-	// pwd, err := osext.ExecutableFolder()
-	// if err != nil {
-	// 	log.Fatalf("cannot retrieve present working directory: %i", 0600, nil)
-	// }
 
-	// err = LoadConfiguration(pwd)
-	// if err != nil {
-	// 	panic(errors.Errorf("Fatal reading config file: %s \n", err))
-	// }
+	var dbUser, dbPass, dbName string
 
-	// var db *pg.DB
-	// if dev == "true" {
-	// 	db = pg.Connect(fmt.Sprintf("host=%s port=%d user=%s "+
-	// 		"password=%s dbname=%s sslmode=disable",
-	// 		dbURL, dbPort, dbUser, dbPass, dbName))
-	// 	if err != nil {
-	// 		panic(errors.Errorf("Cannot connect to database: %s", err))
-	// 	}
-	// } else {
-	// 	db = pg.Connect(dbURL)
-	// 	if err != nil {
-	// 		panic(errors.Errorf("Cannot connect to database: %s", err))
-	// 	}
-	// }
+	if dev == "true" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
+	}
+
+	dbUser = os.Getenv("VOZ_DATABASE_USER")
+	dbName = os.Getenv("VOZ_DATABASE_NAME")
+	dbPass = os.Getenv("VOZ_DATABASE_PASSWORD")
 
 	db := pg.Connect(&pg.Options{
-		User:     "nntien",
-		Database: "vozarchive",
+		User:     dbUser,
+		Database: dbName,
+		Password: dbPass,
 	})
 
 	router := gin.Default()
