@@ -12,8 +12,8 @@ def deploy():
         run("git pull")
         run("dep ensure")
     with cd(code_dir + "/serviceWorker"):
-        run("go install")
+        run("go build -o voz-worker main.go")
     with cd(code_dir + "/interface"):
         run("go build -o voz-interface main.go")
-        run("./voz-interface")
+    run("sudo systemctl start voz")
         

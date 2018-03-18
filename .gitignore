@@ -5,3 +5,5 @@ db/dbconfig.yml
 .env
 vendor
 *.pyc
+voz-interface
+voz-worker
