@@ -22,6 +22,7 @@ func init() {
 }
 
 func main() {
+	flag.Parse()
 
 	var dbUser, dbPass, dbName string
 
@@ -35,6 +36,10 @@ func main() {
 	dbUser = os.Getenv("VOZ_DATABASE_USER")
 	dbName = os.Getenv("VOZ_DATABASE_NAME")
 	dbPass = os.Getenv("VOZ_DATABASE_PASSWORD")
+
+	log.Println("database_username", dbUser)
+	log.Println("database_name", dbName)
+	log.Println("database_password", dbPass)
 
 	db := pg.Connect(&pg.Options{
 		User:     dbUser,
