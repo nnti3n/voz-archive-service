@@ -13,6 +13,6 @@ def deploy():
         run("dep ensure")
         run("go build -o voz-worker serviceWorker/main.go")
         run("go build -o voz-interface interface/main.go")
-        run("sudo systemctl start voz-worker")
-        run("sudo systemctl start voz-interface")
+        run("sudo systemctl restart voz-worker")
+        run("sudo systemctl restart voz-interface")
         
