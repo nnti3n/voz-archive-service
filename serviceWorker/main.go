@@ -1,50 +1,49 @@
 package main
 
 import (
-	"fmt"
+	"flag"
 	"log"
 	"os"
 
 	"github.com/go-pg/pg"
+	"github.com/joho/godotenv"
 	"github.com/nnti3n/voz-archive-service/serviceWorker/vozscrape"
-	"github.com/nnti3n/voz-archive-service/utilities"
 )
 
+var dev string
+
 func init() {
+	flag.StringVar(&dev, "dev", "true", "build for local dev")
 	log.SetFlags(log.LstdFlags | log.Llongfile)
 }
 
 // this is the console application
 func main() {
 	s := vozscrape.NewBox(5)
-	f, err := os.Create("json.txt")
-	check(err)
-
-	content := serialStruct(s)
-	_, err = f.WriteString(content)
-	check(err)
-	fmt.Println("Wrote json.txt")
-
 	DbModel(s)
-}
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-// Box will scape forum boxes
-func serialStruct(s *vozscrape.Box) string {
-	res2B, _ := utilities.JSONMarshal(s, true)
-	return string(res2B)
 }
 
 // DbModel will map model to db
 func DbModel(box *vozscrape.Box) {
+	flag.Parse()
+
+	var dbUser, dbPass, dbName string
+
+	if dev == "true" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
+	}
+
+	dbUser = os.Getenv("VOZ_DATABASE_USER")
+	dbName = os.Getenv("VOZ_DATABASE_NAME")
+	dbPass = os.Getenv("VOZ_DATABASE_PASSWORD")
+
 	db := pg.Connect(&pg.Options{
-		User:     "nntien",
-		Database: "vozarchive",
+		User:     dbUser,
+		Database: dbName,
+		Password: dbPass,
 	})
 
 	_, err := db.Model(box).
@@ -54,7 +53,6 @@ func DbModel(box *vozscrape.Box) {
 			OnConflict("(id) DO UPDATE").
 			Set("page_count = ?page_count, post_count = ?post_count, view_count = ?view_count").
 			Insert()
-		err = db.Insert(thread)
 		for _, post := range thread.Posts {
 			_, err = db.Model(post).
 				OnConflict("DO NOTHING").Insert()

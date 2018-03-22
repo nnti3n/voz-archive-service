@@ -16,9 +16,9 @@ type Thread struct {
 	ID              int
 	Title           string
 	Source          string
-	PageCount       int
-	PostCount       int
-	ViewCount       int
+	PageCount       int `sql:",notnull"`
+	PostCount       int `sql:",notnull"`
+	ViewCount       int `sql:",notnull"`
 	BoxID           int
 	UserIDStarter   int
 	UserNameStarter string
@@ -29,7 +29,7 @@ type Thread struct {
 // Post is the struct for a single Post in thread
 type Post struct {
 	ID       int
-	Number   int
+	Number   int `sql:",notnull"`
 	UserID   int
 	UserName string
 	Time     string
@@ -65,7 +65,7 @@ func NewThread(id int, title string, userID int, userName string, source string,
 		thread.PageCount = 1
 	}
 	if thread.PostCount == t.PostCount {
-		log.Println("same postcount", id)
+		log.Println("same postcount", thread.PostCount)
 		return t
 	}
 
