@@ -24,10 +24,14 @@ type ThreadFilter struct {
 	BoxID int
 }
 
+var excludeThreads = []int{6735473, 6609261, 3613304, 2024506, 5523490}
+
 // threadFilter filter threads by id and page
 func (f *ThreadFilter) threadFilter(q *orm.Query) (*orm.Query, error) {
 	if f.BoxID > 0 {
-		q = q.Where("box_id = ?", f.BoxID)
+		q = q.Where("box_id = ?", f.BoxID).
+			Where("id not in (?)", pg.In(excludeThreads)).
+			Where("post_count > ?", 0)
 	}
 	q = q.Apply(f.Pager.Paginate)
 	return q, nil
@@ -41,7 +45,8 @@ func (e *Env) FetchAllThread(c *gin.Context) {
 	filter.BoxID = boxID
 
 	threads := []vozscrape.Thread{}
-	count, err := e.Db.Model(&threads).Apply(filter.threadFilter).SelectAndCount()
+	count, err := e.Db.Model(&threads).Apply(filter.threadFilter).
+		SelectAndCount()
 	pageCount := count / 10
 	if math.Mod(float64(count), 10) > 0 {
 		pageCount = count/10 + 1
@@ -104,7 +109,8 @@ func (e *Env) FetchThreadPosts(c *gin.Context) {
 	filter.ThreadID = threadID
 
 	posts := []vozscrape.Post{}
-	count, err := e.Db.Model(&posts).Apply(filter.postFilter).SelectAndCount()
+	count, err := e.Db.Model(&posts).Apply(filter.postFilter).
+		SelectAndCount()
 	pageCount := count / 10
 	if math.Mod(float64(count), 10) > 0 {
 		pageCount = count/10 + 1
