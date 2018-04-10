@@ -50,12 +50,12 @@ func main() {
 	router := gin.Default()
 	router.Use(cors.Default())
 	env := requesthandler.Env{Db: db}
-	r := router.Group("/api")
+	r := router.Group("/")
 	{
 		// r.GET("/box", fetchAllBox)
-		r.GET("/box/:boxID", env.FetchAllThread)
-		r.GET("/thread/:threadID", env.FetchSingleThread)
-		r.GET("/thread/:threadID/posts", env.FetchThreadPosts)
+		r.GET("box/:boxID", env.FetchAllThread)
+		r.GET("thread/:threadID", env.FetchSingleThread)
+		r.GET("thread/:threadID/posts", env.FetchThreadPosts)
 	}
 	router.Run()
 }
