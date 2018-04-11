@@ -2,7 +2,9 @@ package utilities
 
 import (
 	"bytes"
+	"log"
 	"testing"
+	"time"
 )
 
 func TestRound(t *testing.T) {
@@ -70,4 +72,15 @@ func TestJSONMarshal(t *testing.T) {
 		t.Errorf("Should contain \\u0026, not &")
 	}
 
+}
+
+func TestParseTime(t *testing.T) {
+	testVal := []string{"Today 01:22",
+		"Yesterday 01:22",
+		"25-11-2016 10:34"}
+	var time time.Time
+	for _, element := range testVal {
+		time = ParseTime(element)
+		log.Println(time)
+	}
 }

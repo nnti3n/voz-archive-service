@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"math"
+	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -56,6 +58,27 @@ func NumberInSlice(a int, list []int) bool {
 	return false
 }
 
+// InArray find number in a slice
+func InArray(val interface{}, array interface{}) (exists bool, index int) {
+	exists = false
+	index = -1
+
+	switch reflect.TypeOf(array).Kind() {
+	case reflect.Slice:
+		s := reflect.ValueOf(array)
+
+		for i := 0; i < s.Len(); i++ {
+			if reflect.DeepEqual(val, s.Index(i).Interface()) == true {
+				index = i
+				exists = true
+				return
+			}
+		}
+	}
+
+	return
+}
+
 // Pagination help
 func Pagination(ctx *gin.Context, defaultLimit int) (limit int, offset int) {
 	limit = intOr(ctx.Query("limit"), defaultLimit)
@@ -69,4 +92,34 @@ func intOr(str string, defaultValue int) int {
 		return defaultValue
 	}
 	return v
+}
+
+// ParseTime is a thread id filter function
+func ParseTime(timestring string) time.Time {
+	datetypes := []string{"Today", "Yesterday"}
+	dateString := strings.Split(timestring, " ")[0]
+	recent, _ := InArray(dateString, datetypes)
+	timestamp := time.Now()
+	now := time.Now()
+
+	timeText := strings.Split(timestring, " ")[1]
+	hour, _ := strconv.Atoi(strings.Split(timeText, ":")[0])
+	minute, _ := strconv.Atoi(strings.Split(timeText, ":")[1])
+	if recent {
+		if dateString == "Today" {
+			timestamp = time.Date(now.Year(), now.Month(), now.Day(),
+				hour, minute, 0, 0, now.Location())
+		} else {
+			timestamp = time.Date(now.Year(), now.Month(), now.Day()-1,
+				hour, minute, 0, 0, now.Location())
+		}
+	} else {
+		date, _ := strconv.Atoi(strings.Split(dateString, "-")[0])
+		month, _ := strconv.Atoi(strings.Split(dateString, "-")[1])
+		year, _ := strconv.Atoi(strings.Split(dateString, "-")[2])
+		timestamp = time.Date(year, time.Month(month), date,
+			hour, minute, 0, 0, now.Location())
+	}
+
+	return timestamp
 }
