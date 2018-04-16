@@ -94,15 +94,15 @@ func intOr(str string, defaultValue int) int {
 	return v
 }
 
-// ParseTime is a thread id filter function
+// ParseTime parse post timestamp
 func ParseTime(timestring string) time.Time {
 	datetypes := []string{"Today", "Yesterday"}
-	dateString := strings.Split(timestring, " ")[0]
+	dateString := strings.Split(timestring, ", ")[0]
 	recent, _ := InArray(dateString, datetypes)
 	timestamp := time.Now()
 	now := time.Now()
 
-	timeText := strings.Split(timestring, " ")[1]
+	timeText := strings.Split(timestring, ", ")[1]
 	hour, _ := strconv.Atoi(strings.Split(timeText, ":")[0])
 	minute, _ := strconv.Atoi(strings.Split(timeText, ":")[1])
 	if recent {
