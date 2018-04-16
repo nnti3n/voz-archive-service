@@ -5,6 +5,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/nnti3n/voz-archive-service/serviceWorker/scraper"
@@ -22,6 +23,7 @@ type Thread struct {
 	BoxID           int
 	UserIDStarter   int
 	UserNameStarter string
+	LastUpdated     time.Time `sql:",notnull"`
 
 	Posts []*Post `sql:"-"`
 }
@@ -32,7 +34,7 @@ type Post struct {
 	Number   int `sql:",notnull"`
 	UserID   int
 	UserName string
-	Time     string
+	Time     time.Time `sql:",notnull"`
 	Content  string
 	ThreadID int
 }
@@ -41,15 +43,15 @@ var excludeThreads = []int{6735473, 6609261, 3613304, 2024506, 5523490}
 
 // NewThread creates a Thread and fills missing information
 // from the Thread page
-func NewThread(id int, title string, userID int, userName string,
-	source string, pageCount string, postCount string, viewCount string,
-	boxID int) *Thread {
+func NewThread(id int, title string, userID int, userName string, source string,
+	pageCount string, postCount string, viewCount string, boxID int) *Thread {
 
 	t := new(Thread)
 	t.ID = id
 	t.Title = title
 	t.UserIDStarter = userID
 	t.UserNameStarter = userName
+	t.LastUpdated = time.Now()
 	t.Source = source
 	t.PageCount, _ = strconv.Atoi(strings.Replace(pageCount, ",", "", -1))
 	t.PostCount, _ = strconv.Atoi(strings.Replace(postCount, ",", "", -1))
@@ -100,9 +102,9 @@ func (t *Thread) getPosts(pPage []scraper.Scraper) []*Post {
 				}
 				p.ID, _ = strconv.
 					Atoi(strings.Split(strings.Split(_number, "=")[1], "&")[0])
-				p.Time = strings.
+				p.Time = utilities.ParseTime(strings.
 					TrimSpace(s.Find("tr:first-child td.thead div:nth-child(2)").
-						Text())
+						Text()))
 
 				userID, exist := s.Find(".bigusername").Attr("href")
 				if !exist {

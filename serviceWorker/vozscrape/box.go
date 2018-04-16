@@ -107,7 +107,9 @@ func (b *Box) fetchThreads(Threads chan *Thread, tPageSelector []goquery.Selecti
 				log.Println("Not found id", exist)
 			}
 			pageCount := "1"
-			pageURL, exist := s.Find("td:nth-child(2) div:first-child span.smallfont a:last-child").Attr("href")
+			pageURL, exist := s.
+				Find("td:nth-child(2) div:first-child span.smallfont a:last-child").
+				Attr("href")
 			if !exist {
 				log.Println("Not found pageURL PageCount 1")
 			} else {
@@ -120,7 +122,8 @@ func (b *Box) fetchThreads(Threads chan *Thread, tPageSelector []goquery.Selecti
 			// a GoRoutine
 			go func(Threads chan *Thread) {
 				defer wg.Done()
-				Threads <- NewThread(utilities.ParseThreadURL(id), title.Text(), userID, userName, source, pageCount, postCount, viewCount, b.ID)
+				Threads <- NewThread(utilities.ParseThreadURL(id), title.Text(), userID,
+					userName, source, pageCount, postCount, viewCount, b.ID)
 
 			}(Threads)
 		})
@@ -132,7 +135,8 @@ func (b *Box) fetchThreads(Threads chan *Thread, tPageSelector []goquery.Selecti
 func (b *Box) fetchBox(boxPage int) []scraper.Scraper {
 	s := []scraper.Scraper{}
 	for i := 1; i <= boxPage; i++ {
-		t := scraper.NewScraper("https://vozforums.com/forumdisplay.php?f="+strconv.Itoa(b.ID)+"&page="+strconv.Itoa(i), "utf-8")
+		t := scraper.NewScraper("https://vozforums.com/forumdisplay.php?f="+
+			strconv.Itoa(b.ID)+"&page="+strconv.Itoa(i), "utf-8")
 		// log.Println(t)
 		s = append(s, *t)
 	}

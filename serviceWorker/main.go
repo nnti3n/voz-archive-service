@@ -53,9 +53,15 @@ func DbModel(box *vozscrape.Box) {
 			OnConflict("(id) DO UPDATE").
 			Set("page_count = ?page_count, post_count = ?post_count, view_count = ?view_count").
 			Insert()
-		for _, post := range thread.Posts {
+		for index, post := range thread.Posts {
 			_, err = db.Model(post).
 				OnConflict("DO NOTHING").Insert()
+			if index+1 == len(thread.Posts) {
+				_, err = db.Model(thread).
+					Set("last_updated = ?", post.Time).
+					Where("id = ?id").
+					Update()
+			}
 		}
 	}
 	if err != nil {
