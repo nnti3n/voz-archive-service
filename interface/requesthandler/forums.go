@@ -31,7 +31,8 @@ func (f *ThreadFilter) threadFilter(q *orm.Query) (*orm.Query, error) {
 	if f.BoxID > 0 {
 		q = q.Where("box_id = ?", f.BoxID).
 			Where("id not in (?)", pg.In(excludeThreads)).
-			Where("post_count > ?", 0)
+			Where("post_count > ?", 0).
+			Order("last_updated DESC")
 	}
 	q = q.Apply(f.Pager.Paginate)
 	return q, nil
