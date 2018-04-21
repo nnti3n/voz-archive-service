@@ -102,12 +102,21 @@ func (f *PostFilter) postFilter(q *orm.Query) (*orm.Query, error) {
 	return q, nil
 }
 
+// ThreadResponse output thread response
+type ThreadResponse struct {
+	Thread vozscrape.Thread `json:"thread"`
+	Posts  []vozscrape.Post `json:"posts"`
+}
+
 // FetchThreadPosts fetch all posts of thread
 func (e *Env) FetchThreadPosts(c *gin.Context) {
 	threadID, _ := strconv.Atoi(c.Param("threadID"))
 	var filter PostFilter
 	filter.Pager.SetURLValues(c.Request.URL.Query())
 	filter.ThreadID = threadID
+
+	thread := vozscrape.Thread{ID: threadID}
+	err := e.Db.Select(&thread)
 
 	posts := []vozscrape.Post{}
 	count, err := e.Db.Model(&posts).Apply(filter.postFilter).
@@ -117,9 +126,14 @@ func (e *Env) FetchThreadPosts(c *gin.Context) {
 		pageCount = count/10 + 1
 	}
 
+	threadRes := ThreadResponse{
+		Thread: thread,
+		Posts:  posts,
+	}
+
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{
-			"data":   posts,
+			"data":   threadRes,
 			"params": filter.ThreadID,
 			"page":   pageCount,
 		})
