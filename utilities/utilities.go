@@ -96,11 +96,14 @@ func intOr(str string, defaultValue int) int {
 
 // ParseTime parse post timestamp
 func ParseTime(timestring string) time.Time {
+	now := time.Now()
+	if len(timestring) == 0 {
+		return now
+	}
 	datetypes := []string{"Today", "Yesterday"}
 	dateString := strings.Split(timestring, ", ")[0]
 	recent, _ := InArray(dateString, datetypes)
 	timestamp := time.Now()
-	now := time.Now()
 
 	timeText := strings.Split(timestring, ", ")[1]
 	hour, _ := strconv.Atoi(strings.Split(timeText, ":")[0])
