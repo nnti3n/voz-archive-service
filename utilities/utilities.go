@@ -96,14 +96,15 @@ func intOr(str string, defaultValue int) int {
 
 // ParseTime parse post timestamp
 func ParseTime(timestring string) time.Time {
-	now := time.Now()
+	loc, _ := time.LoadLocation("Asia/Bangkok")
+	now := time.Now().In(loc)
 	if len(timestring) == 0 {
 		return now
 	}
 	datetypes := []string{"Today", "Yesterday"}
 	dateString := strings.Split(timestring, ", ")[0]
 	recent, _ := InArray(dateString, datetypes)
-	timestamp := time.Now()
+	timestamp := time.Now().In(loc)
 
 	timeText := strings.Split(timestring, ", ")[1]
 	hour, _ := strconv.Atoi(strings.Split(timeText, ":")[0])
@@ -111,17 +112,17 @@ func ParseTime(timestring string) time.Time {
 	if recent {
 		if dateString == "Today" {
 			timestamp = time.Date(now.Year(), now.Month(), now.Day(),
-				hour, minute, 0, 0, now.Location())
+				hour, minute, 0, 0, loc)
 		} else {
 			timestamp = time.Date(now.Year(), now.Month(), now.Day()-1,
-				hour, minute, 0, 0, now.Location())
+				hour, minute, 0, 0, loc)
 		}
 	} else {
 		date, _ := strconv.Atoi(strings.Split(dateString, "-")[0])
 		month, _ := strconv.Atoi(strings.Split(dateString, "-")[1])
 		year, _ := strconv.Atoi(strings.Split(dateString, "-")[2])
 		timestamp = time.Date(year, time.Month(month), date,
-			hour, minute, 0, 0, now.Location())
+			hour, minute, 0, 0, loc)
 	}
 
 	return timestamp
