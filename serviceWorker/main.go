@@ -19,12 +19,14 @@ func init() {
 
 // this is the console application
 func main() {
-	s := vozscrape.NewBox(5)
-	DbModel(s)
+	news := vozscrape.NewBox(33, 3)
+	random := vozscrape.NewBox(17, 3)
+	InsertDB(news)
+	InsertDB(random)
 }
 
-// DbModel will map model to db
-func DbModel(box *vozscrape.Box) {
+// InsertDB will map model to db
+func InsertDB(box *vozscrape.Box) {
 	flag.Parse()
 
 	var dbUser, dbPass, dbName string
@@ -67,4 +69,5 @@ func DbModel(box *vozscrape.Box) {
 	if err != nil {
 		panic(err)
 	}
+	log.Println("Done!", box.ID)
 }
