@@ -1,7 +1,6 @@
 package vozscrape
 
 import (
-	"fmt"
 	"log"
 	"net/url"
 	"regexp"
@@ -41,7 +40,8 @@ type Post struct {
 	ThreadID int
 }
 
-var excludeThreads = []int{6735473, 6609261, 3613304, 2024506, 5523490}
+var excludeThreads = []int{6735473, 6609261, 3613304, 2024506, 5523490, 4289698,
+	3805350, 3805345, 3973882, 4000407, 2926112, 6830409, 4573733, 6822821, 4080256}
 
 // NewThread creates a Thread and fills missing information
 // from the Thread page
@@ -61,7 +61,7 @@ func NewThread(id int, title string, userID int, userName string, source string,
 	t.BoxID = boxID
 
 	if utilities.NumberInSlice(id, excludeThreads) {
-		log.Println("met", id)
+		// log.Println("met", id)
 		return t
 	}
 
@@ -71,7 +71,7 @@ func NewThread(id int, title string, userID int, userName string, source string,
 		thread.PageCount = 1
 	}
 	if thread.PostCount == t.PostCount {
-		log.Println("same postcount", thread.PostCount)
+		// log.Println("same postcount", thread.ID, thread.PostCount)
 		return t
 	}
 
@@ -93,13 +93,11 @@ func (t *Thread) getPosts(pPage []scraper.Scraper) []*Post {
 				number := s.Find("tr:first-child td div:first-child a:first-child")
 				numberName, exist := number.Attr("name")
 				if !exist {
-					fmt.Println("Not found post number, set -1")
 					numberName = "-1"
 				}
 				p.Number, _ = strconv.Atoi(numberName)
 				_number, exist := number.Attr("href")
 				if !exist {
-					fmt.Println("no post href")
 					return
 				}
 				p.ID, _ = strconv.
@@ -110,7 +108,6 @@ func (t *Thread) getPosts(pPage []scraper.Scraper) []*Post {
 
 				userID, exist := s.Find(".bigusername").Attr("href")
 				if !exist {
-					fmt.Println("not found userID")
 					p.UserID = -1
 				} else {
 					p.UserID, _ = strconv.Atoi(strings.Split(userID, "u=")[1])
@@ -133,6 +130,7 @@ func (t *Thread) getPosts(pPage []scraper.Scraper) []*Post {
 			})
 	}
 
+	log.Println(t.ID, len(posts))
 	return posts
 }
 
@@ -141,7 +139,6 @@ func (t *Thread) fetchThread(currentPageCount int) []scraper.Scraper {
 	i := 1
 	if t.PageCount >= currentPageCount {
 		i = currentPageCount
-		log.Println("Count", currentPageCount, t.PageCount)
 	}
 	for i <= t.PageCount {
 		p := scraper.

@@ -3,7 +3,6 @@ package vozscrape
 
 import (
 	"fmt"
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -27,10 +26,10 @@ type Box struct {
 }
 
 // NewBox Loop through every item with a goRoutine
-func NewBox(boxPage int) *Box {
+func NewBox(boxID int, boxPage int) *Box {
 
 	b := new(Box)
-	b.ID = 33
+	b.ID = boxID
 	b.Threads = b.getAsyncThreads(boxPage)
 
 	return b
@@ -49,7 +48,7 @@ func (b *Box) getAsyncThreads(boxPage int) []*Thread {
 
 	// Select all the threads in a box
 	for _, page := range s {
-		threadSelector := page.Find("#threadbits_forum_33 > tr")
+		threadSelector := page.Find("#threadbits_forum_" + strconv.Itoa(b.ID) + " > tr")
 		tLen += threadSelector.Size()
 		tPageSelector = append(tPageSelector, *threadSelector)
 	}
@@ -92,27 +91,19 @@ func (b *Box) fetchThreads(Threads chan *Thread, tPageSelector []goquery.Selecti
 
 			title := s.Find("td:nth-child(2) > div:first-child > a:last-of-type")
 			// userID := -1
-			_userID, exist := s.Find("td:nth-child(2) > .smallfont span:last-child").Attr("onclick")
+			_userID, _ := s.Find("td:nth-child(2) > .smallfont span:last-child").Attr("onclick")
 			rUserID := regexp.MustCompile(`[\d]+`)
 			userID, _ := strconv.Atoi(rUserID.FindString(_userID))
 
 			userName := s.Find("td:nth-child(2) > .smallfont span").Text()
 
-			source, exist := s.Find("td:nth-child(2)").Attr("title")
-			if !exist {
-				log.Println("Not found source ", exist)
-			}
-			id, exist := title.Attr("href")
-			if !exist {
-				log.Println("Not found id", exist)
-			}
+			source, _ := s.Find("td:nth-child(2)").Attr("title")
+			id, _ := title.Attr("href")
 			pageCount := "1"
-			pageURL, exist := s.
+			pageURL, pageURLExist := s.
 				Find("td:nth-child(2) div:first-child span.smallfont a:last-child").
 				Attr("href")
-			if !exist {
-				log.Println("Not found pageURL PageCount 1")
-			} else {
+			if pageURLExist {
 				pageCount = strings.Split(pageURL, "page=")[1]
 			}
 			postCount := s.Find("td:nth-child(4) a").Text()
