@@ -3,6 +3,8 @@ package vozscrape
 import (
 	"fmt"
 	"log"
+	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -114,10 +116,19 @@ func (t *Thread) getPosts(pPage []scraper.Scraper) []*Post {
 					p.UserID, _ = strconv.Atoi(strings.Split(userID, "u=")[1])
 				}
 				p.UserName = strings.TrimSpace(s.Find(".bigusername").Text())
-				_content, _ := s.Find(".voz-post-message").Html()
-				p.Content = strings.TrimSpace(_content)
-				p.ThreadID = t.ID
 
+				// dealing with post content
+				_content, _ := s.Find(".voz-post-message").Html()
+				rcontent := regexp.MustCompile(`"(\/redirect\/index.php)(.*?)"`)
+				urlText := rcontent.FindString(_content)
+				if urlText != "" {
+					urlReplace, _ := url.QueryUnescape(urlText)
+					urlReplace = strings.Replace(urlReplace, "/redirect/index.php?link=", "", -1)
+					_content = strings.Replace(_content, urlText, urlReplace, -1)
+				}
+				p.Content = strings.TrimSpace(_content)
+
+				p.ThreadID = t.ID
 				posts = append(posts, p)
 			})
 	}
