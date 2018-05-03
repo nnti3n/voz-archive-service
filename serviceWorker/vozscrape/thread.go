@@ -128,6 +128,8 @@ func (t *Thread) getPosts(pPage []scraper.Scraper) []*Post {
 				p.ThreadID = t.ID
 				posts = append(posts, p)
 			})
+
+		// end of page
 	}
 
 	log.Println(t.ID, len(posts))
@@ -136,16 +138,22 @@ func (t *Thread) getPosts(pPage []scraper.Scraper) []*Post {
 
 func (t *Thread) fetchThread(currentPageCount int) []scraper.Scraper {
 	s := []scraper.Scraper{}
-	i := 1
-	if t.PageCount >= currentPageCount {
-		i = currentPageCount
+
+	// only scrape max 20 page
+	scrapeTarget := t.PageCount
+	if t.PageCount >= currentPageCount+20 {
+		scrapeTarget = currentPageCount + 20
+		t.PageCount = scrapeTarget
 	}
-	for i <= t.PageCount {
+
+	// scrape
+	count := currentPageCount
+	for count <= scrapeTarget {
 		p := scraper.
 			NewScraper("https://vozforums.com/showthread.php?t="+
-				strconv.Itoa(t.ID)+"&page="+strconv.Itoa(i), "utf-8")
+				strconv.Itoa(t.ID)+"&page="+strconv.Itoa(count), "utf-8")
 		s = append(s, *p)
-		i++
+		count++
 	}
 	return s
 }

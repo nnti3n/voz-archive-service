@@ -20,8 +20,8 @@ func init() {
 // this is the console application
 func main() {
 	news := vozscrape.NewBox(33, 3)
-	random := vozscrape.NewBox(17, 3)
 	InsertDB(news)
+	random := vozscrape.NewBox(17, 3)
 	InsertDB(random)
 }
 
