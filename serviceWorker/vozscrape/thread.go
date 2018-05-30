@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/go-pg/pg"
 	"github.com/nnti3n/voz-archive-service/serviceWorker/scraper"
 	"github.com/nnti3n/voz-archive-service/utilities"
 )
@@ -67,16 +68,21 @@ func NewThread(id int, title string, userID int, userName string, source string,
 
 	thread := Thread{}
 	err := db.Model(&thread).Where("id = ?", id).Select()
+
 	if err != nil {
 		thread.PageCount = 1
 	}
+
+	var count int
+	_, err = db.Model((*Post)(nil)).
+		QueryOne(pg.Scan(&count), `SELECT count(*) FROM posts WHERE thread_id = ?`, id)
 
 	// only scrape max 20 page
 	if t.PageCount >= thread.PageCount+20 {
 		t.PageCount = thread.PageCount + 20
 	}
 
-	if thread.PostCount == t.PostCount && thread.PageCount == t.PageCount {
+	if count == t.PostCount && thread.PageCount == t.PageCount {
 		// log.Println("same postcount", thread.ID, thread.PostCount)
 		return t
 	}
