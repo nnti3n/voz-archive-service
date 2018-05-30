@@ -70,6 +70,12 @@ func NewThread(id int, title string, userID int, userName string, source string,
 	if err != nil {
 		thread.PageCount = 1
 	}
+
+	// only scrape max 20 page
+	if t.PageCount >= thread.PageCount+20 {
+		t.PageCount = thread.PageCount + 20
+	}
+
 	if thread.PostCount == t.PostCount && thread.PageCount == t.PageCount {
 		// log.Println("same postcount", thread.ID, thread.PostCount)
 		return t
@@ -77,7 +83,6 @@ func NewThread(id int, title string, userID int, userName string, source string,
 
 	// Start scraping thread
 	tPage := t.fetchThread(thread.PageCount)
-
 	t.Posts = t.getPosts(tPage)
 
 	return t
@@ -139,16 +144,9 @@ func (t *Thread) getPosts(pPage []scraper.Scraper) []*Post {
 func (t *Thread) fetchThread(currentPageCount int) []scraper.Scraper {
 	s := []scraper.Scraper{}
 
-	// only scrape max 20 page
-	scrapeTarget := t.PageCount
-	if t.PageCount >= currentPageCount+20 {
-		scrapeTarget = currentPageCount + 20
-		t.PageCount = scrapeTarget
-	}
-
 	// scrape
 	count := currentPageCount
-	for count <= scrapeTarget {
+	for count <= t.PageCount {
 		p := scraper.
 			NewScraper("https://vozforums.com/showthread.php?t="+
 				strconv.Itoa(t.ID)+"&page="+strconv.Itoa(count), "utf-8")
