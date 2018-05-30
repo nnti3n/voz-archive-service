@@ -70,7 +70,7 @@ func NewThread(id int, title string, userID int, userName string, source string,
 	if err != nil {
 		thread.PageCount = 1
 	}
-	if thread.PostCount == t.PostCount {
+	if thread.PostCount == t.PostCount && thread.PageCount == t.PageCount {
 		// log.Println("same postcount", thread.ID, thread.PostCount)
 		return t
 	}
