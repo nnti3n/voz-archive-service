@@ -74,15 +74,19 @@ func NewThread(id int, title string, userID int, userName string, source string,
 	}
 
 	var count int
-	_, err = db.Model((*Post)(nil)).
+	_, errCount := db.Model((*Post)(nil)).
 		QueryOne(pg.Scan(&count), `SELECT count(*) FROM posts WHERE thread_id = ?`, id)
-
-	// only scrape max 20 page
-	if t.PageCount >= thread.PageCount+20 {
-		t.PageCount = thread.PageCount + 20
+	if errCount != nil {
+		count = 0
 	}
 
-	if count == t.PostCount && thread.PageCount == t.PageCount {
+	// only scrape max 20 page
+	if t.PageCount >= count/10+20 {
+		t.PageCount = count/10 + 20
+		t.PostCount = count + 20*10
+	}
+
+	if count == t.PostCount {
 		// log.Println("same postcount", thread.ID, thread.PostCount)
 		return t
 	}
