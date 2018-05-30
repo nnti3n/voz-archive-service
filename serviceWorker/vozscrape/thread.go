@@ -80,15 +80,15 @@ func NewThread(id int, title string, userID int, userName string, source string,
 		count = 0
 	}
 
+	if count == t.PostCount && thread.PageCount == t.PageCount {
+		// log.Println("same postcount", thread.ID, thread.PostCount)
+		return t
+	}
+
 	// only scrape max 20 page
 	if t.PageCount >= count/10+20 {
 		t.PageCount = count/10 + 20
 		t.PostCount = count + 20*10
-	}
-
-	if count == t.PostCount {
-		// log.Println("same postcount", thread.ID, thread.PostCount)
-		return t
 	}
 
 	// Start scraping thread
