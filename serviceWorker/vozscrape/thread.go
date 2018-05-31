@@ -77,6 +77,7 @@ func NewThread(id int, title string, userID int, userName string, source string,
 	_, errCount := db.Model((*Post)(nil)).
 		QueryOne(pg.Scan(&count), `SELECT count(*) FROM posts WHERE thread_id = ?`, id)
 	if errCount != nil {
+		log.Println("cant find post count")
 		count = 0
 	}
 
@@ -86,7 +87,7 @@ func NewThread(id int, title string, userID int, userName string, source string,
 	}
 
 	// only scrape max 20 page
-	if t.PageCount >= count/10+20 {
+	if t.PageCount > count/10+20 {
 		t.PageCount = (count/10 + 20)
 		t.PostCount = (count + 20*10)
 	}
@@ -152,6 +153,7 @@ func (t *Thread) getPosts(pPage []scraper.Scraper) []*Post {
 }
 
 func (t *Thread) fetchThread(currentPageCount int) []scraper.Scraper {
+	log.Println(t.ID, currentPageCount, "to", t.PageCount)
 	s := []scraper.Scraper{}
 
 	// scrape
