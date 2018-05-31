@@ -92,7 +92,7 @@ func NewThread(id int, title string, userID int, userName string, source string,
 	}
 
 	// Start scraping thread
-	tPage := t.fetchThread(thread.PageCount)
+	tPage := t.fetchThread(count / 10)
 	t.Posts = t.getPosts(tPage)
 
 	return t
