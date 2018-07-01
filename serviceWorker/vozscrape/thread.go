@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/go-pg/pg"
 	"github.com/nnti3n/voz-archive-service/serviceWorker/scraper"
 	"github.com/nnti3n/voz-archive-service/utilities"
 )
@@ -73,12 +72,10 @@ func NewThread(id int, title string, userID int, userName string, source string,
 		thread.PageCount = 1
 	}
 
-	var count int
-	_, errCount := db.Model((*Post)(nil)).
-		QueryOne(pg.Scan(&count), `SELECT count(*) FROM posts WHERE thread_id = ?`, id)
+	count, errCount := db.Model((*Post)(nil)).Where("thread_id = ?", id).Count()
 	if errCount != nil {
-		log.Println("cant find post count")
-		count = 0
+		log.Println("cant find post count", errCount)
+		count = 1
 	}
 
 	if count == t.PostCount && thread.PageCount == t.PageCount {
@@ -160,7 +157,7 @@ func (t *Thread) fetchThread(currentPageCount int) []scraper.Scraper {
 	count := currentPageCount
 	for count <= t.PageCount {
 		p := scraper.
-			NewScraper("https://vozforums.com/showthread.php?t="+
+			NewScraper("https://forums.voz.vn/showthread.php?t="+
 				strconv.Itoa(t.ID)+"&page="+strconv.Itoa(count), "utf-8")
 		s = append(s, *p)
 		count++

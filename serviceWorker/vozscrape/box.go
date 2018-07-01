@@ -126,7 +126,7 @@ func (b *Box) fetchThreads(Threads chan *Thread, tPageSelector []goquery.Selecti
 func (b *Box) fetchBox(boxPage int) []scraper.Scraper {
 	s := []scraper.Scraper{}
 	for i := 1; i <= boxPage; i++ {
-		t := scraper.NewScraper("https://vozforums.com/forumdisplay.php?f="+
+		t := scraper.NewScraper("https://forums.voz.vn/forumdisplay.php?f="+
 			strconv.Itoa(b.ID)+"&page="+strconv.Itoa(i), "utf-8")
 		// log.Println(t)
 		s = append(s, *t)
